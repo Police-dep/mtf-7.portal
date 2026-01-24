@@ -11,45 +11,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
-        /* === ПЕРЕМЕННЫЕ ДЛЯ ТЕМ === */
+        /* === ГЛОБАЛЬНЫЕ СТИЛИ === */
         :root {
-            /* Темная тема (по умолчанию) */
             --bg-body: #050505;
             --bg-panel: #0f0f0f;
             --bg-input: #141414;
-            --bg-hover: #1a1a1a;
             --border: #333333;
             --text-main: #e0e0e0;
             --text-dim: #888888;
-            --text-muted: #666666;
             --accent: #ffffff;
             --danger: #cf3434;
             --success: #2e8b57;
-            --warning: #ff9900;
             --font-stack: 'JetBrains Mono', monospace;
-            --card-border: #ffffff;
-            --shadow: rgba(0, 0, 0, 0.8);
-            --sidebar-bg: #0f0f0f;
-        }
-
-        .light-theme {
-            /* Светлая тема */
-            --bg-body: #f5f5f5;
-            --bg-panel: #ffffff;
-            --bg-input: #f0f0f0;
-            --bg-hover: #f8f8f8;
-            --border: #dddddd;
-            --text-main: #222222;
-            --text-dim: #555555;
-            --text-muted: #777777;
-            --accent: #000000;
-            --danger: #d32f2f;
-            --success: #2e7d32;
-            --warning: #f57c00;
-            --font-stack: 'JetBrains Mono', monospace;
-            --card-border: #000000;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --sidebar-bg: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -60,18 +33,16 @@
             font-family: var(--font-stack);
             font-size: 14px;
             line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-user-select: none; 
-            user-select: none;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-user-select: none; user-select: none;
         }
 
         /* Скроллбар */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-body); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #666; }
 
         .hidden { display: none !important; }
         
@@ -88,16 +59,15 @@
             width: 420px; padding: 40px;
             background: var(--bg-panel);
             border: 1px solid var(--border);
-            box-shadow: 0 0 40px var(--shadow);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
             position: relative;
-            max-width: 90%;
         }
 
         .login-title {
             text-align: center; margin-bottom: 30px;
             border-bottom: 1px solid var(--border); padding-bottom: 20px;
         }
-        .login-title h1 { font-size: 32px; font-weight: 800; letter-spacing: 4px; color: var(--accent); margin: 0; }
+        .login-title h1 { font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #fff; margin: 0; }
         .login-title p { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; letter-spacing: 2px; }
 
         .input-group { margin-bottom: 20px; }
@@ -108,45 +78,42 @@
         .input-group input {
             width: 100%; padding: 14px;
             background: var(--bg-input); border: 1px solid var(--border);
-            color: var(--text-main); font-family: inherit; font-size: 14px;
+            color: #fff; font-family: inherit; font-size: 14px;
             transition: 0.2s;
         }
-        .input-group input:focus { outline: none; border-color: var(--accent); background: var(--bg-hover); }
+        .input-group input:focus { outline: none; border-color: #fff; background: #1a1a1a; }
 
         .btn-login {
             width: 100%; padding: 14px;
-            background: var(--accent); color: var(--bg-body);
+            background: #fff; color: #000;
             border: none; font-weight: 800; text-transform: uppercase;
             cursor: pointer; transition: 0.3s; margin-top: 10px;
         }
-        .btn-login:hover { opacity: 0.9; }
+        .btn-login:hover { background: #ccc; }
 
         .close-login { position: absolute; top: 15px; right: 20px; color: var(--text-dim); cursor: pointer; font-size: 18px; }
         .login-error { color: var(--danger); font-size: 12px; text-align: center; margin-top: 15px; min-height: 18px; font-weight: 700; }
 
         /* === ИНТЕРФЕЙС === */
-        .app-layout { display: flex; min-height: 100vh; position: relative; }
+        .app-layout { display: flex; height: 100vh; }
 
         /* САЙДБАР */
         .sidebar {
-            width: 320px; background: var(--sidebar-bg);
+            width: 320px; background: var(--bg-panel);
             border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0;
-            transition: transform 0.3s ease;
-            z-index: 100;
-            position: relative;
         }
 
         .sidebar-header {
             height: 90px; display: flex; align-items: center; padding: 0 30px;
             border-bottom: 1px solid var(--border);
         }
-        .sidebar-header h2 { font-size: 24px; font-weight: 800; letter-spacing: 2px; color: var(--accent); }
+        .sidebar-header h2 { font-size: 24px; font-weight: 800; letter-spacing: 2px; color: #fff; }
 
         .nav-area { flex: 1; padding: 30px; overflow-y: auto; }
         
         .nav-category {
-            font-size: 10px; color: var(--text-muted); text-transform: uppercase;
+            font-size: 10px; color: #555; text-transform: uppercase;
             margin: 25px 0 10px 0; letter-spacing: 1px; font-weight: 700;
         }
         .nav-category:first-child { margin-top: 0; }
@@ -158,109 +125,39 @@
             color: var(--text-dim); text-align: left;
             cursor: pointer; font-family: inherit; font-size: 13px;
             transition: 0.2s;
-            border-left: 2px solid transparent;
         }
-        .nav-btn:hover { color: var(--accent); background: var(--bg-hover); }
-        .nav-btn.active { color: var(--accent); font-weight: 700; border-left-color: var(--accent); }
-        .nav-btn.active i { color: var(--accent); }
-        .nav-btn i { width: 25px; text-align: center; font-size: 14px; color: var(--text-muted); transition: 0.2s; }
+        .nav-btn:hover { color: #fff; }
+        .nav-btn.active { color: #fff; font-weight: 700; }
+        .nav-btn.active i { color: #fff; }
+        .nav-btn i { width: 25px; text-align: center; font-size: 14px; color: #444; transition: 0.2s; }
 
         .user-status {
             padding: 25px 30px; border-top: 1px solid var(--border);
-            font-size: 11px; color: var(--text-dim); background: var(--bg-input);
-        }
-
-        /* Кнопка бургер-меню для мобильных */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 25px;
-            left: 20px;
-            z-index: 101;
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 50px;
-            height: 50px;
-            border-radius: 4px;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 24px;
-        }
-
-        .mobile-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
+            font-size: 11px; color: var(--text-dim); background: #0c0c0c;
         }
 
         /* КОНТЕНТ */
-        .content-area { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            width: 100%;
-        }
+        .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
         .top-bar {
             height: 90px; border-bottom: 1px solid var(--border);
             background: var(--bg-panel); display: flex; align-items: center;
             justify-content: space-between; padding: 0 50px; flex-shrink: 0;
-            position: relative;
         }
-        .page-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
-
-        .top-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .theme-toggle {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-hover);
-        }
+        .page-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
 
         .auth-btn {
             border: 1px solid var(--border); background: transparent;
             color: var(--text-main); padding: 10px 24px;
             font-family: inherit; font-size: 12px; font-weight: 700;
             cursor: pointer; transition: 0.3s;
-            border-radius: 4px;
         }
-        .auth-btn:hover { background: var(--accent); color: var(--bg-body); }
+        .auth-btn:hover { background: #fff; color: #000; }
 
-        .scroll-container { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 60px 100px; 
-            scroll-behavior: smooth;
-            width: 100%;
-        }
+        .scroll-container { flex: 1; overflow-y: auto; padding: 60px 100px; scroll-behavior: smooth; }
 
         /* === ТИПОГРАФИКА И ЭЛЕМЕНТЫ === */
-        .section { display: none; max-width: 1200px; margin: 0 auto; padding-bottom: 100px; width: 100%; }
+        .section { display: none; max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
         .section.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
@@ -271,359 +168,70 @@
             display: flex; 
             justify-content: space-between; 
             align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 20px;
         }
-        .section-header h1 { 
-            font-size: 36px; 
-            font-weight: 800; 
-            color: var(--accent); 
-            margin-bottom: 10px; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            line-height: 1.2;
-        }
-        .section-header p { 
-            font-size: 13px; 
-            color: var(--text-dim); 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-        }
+        .section-header h1 { font-size: 36px; font-weight: 800; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .section-header p { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
 
         .card {
-            background: var(--bg-panel); 
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--card-border);
-            padding: 40px; 
-            margin-bottom: 40px; 
-            position: relative;
-            box-shadow: 0 5px 15px var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--bg-panel); border: 1px solid var(--border);
+            padding: 50px; margin-bottom: 40px; position: relative;
         }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--shadow);
-        }
+        .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #fff; }
 
         .card h3 {
-            font-size: 20px; 
-            color: var(--accent); 
-            margin: 0 0 25px 0;
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            display: flex; 
-            align-items: center; 
-            gap: 15px;
+            font-size: 20px; color: #fff; margin: 0 0 25px 0;
+            text-transform: uppercase; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 15px;
         }
         
-        .card p { 
-            margin-bottom: 15px; 
-            text-align: justify; 
-            color: var(--text-dim); 
-            font-size: 14px; 
-            line-height: 1.7;
-        }
-        .card strong { color: var(--accent); font-weight: 700; }
+        .card p { margin-bottom: 15px; text-align: justify; color: #b0b0b0; font-size: 14px; }
+        .card strong { color: #fff; font-weight: 700; }
 
         /* Списки */
         .doc-list { list-style: none; margin-left: 0; margin-bottom: 20px; }
-        .doc-list li { 
-            position: relative; 
-            padding-left: 20px; 
-            margin-bottom: 10px; 
-            color: var(--text-dim); 
-            font-size: 14px; 
-            line-height: 1.6;
-        }
-        .doc-list li::before { content: '>'; position: absolute; left: 0; color: var(--text-muted); font-weight: bold; }
+        .doc-list li { position: relative; padding-left: 20px; margin-bottom: 10px; color: #b0b0b0; font-size: 14px; }
+        .doc-list li::before { content: '>'; position: absolute; left: 0; color: #555; font-weight: bold; }
         
-        ol { margin-left: 20px; margin-bottom: 20px; color: var(--text-dim); }
-        ol li { margin-bottom: 10px; padding-left: 10px; line-height: 1.6; }
+        ol { margin-left: 20px; margin-bottom: 20px; color: #b0b0b0; }
+        ol li { margin-bottom: 10px; padding-left: 10px; }
 
         /* Таблица */
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; overflow-x: auto; display: block; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid var(--border); color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
-        td { padding: 15px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
-        tr:hover td { background: var(--bg-hover); color: var(--text-main); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #333; color: #666; text-transform: uppercase; font-size: 11px; }
+        td { padding: 15px; border-bottom: 1px solid #222; color: #ccc; }
+        tr:hover td { background: #151515; color: #fff; }
 
         /* Кнопка */
         .recruit-btn {
             display: inline-flex; align-items: center; gap: 10px;
-            padding: 16px 32px; background: var(--accent); color: var(--bg-body);
+            padding: 16px 32px; background: #fff; color: #000;
             text-decoration: none; font-weight: 800; text-transform: uppercase;
             margin-top: 30px; font-size: 13px; transition: 0.3s;
-            border-radius: 4px;
         }
-        .recruit-btn:hover { opacity: 0.9; }
+        .recruit-btn:hover { background: #ccc; }
         
         /* Сетка машин */
-        .fleet-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 20px; 
-            margin-top: 30px; 
-        }
-        .car-card { 
-            background: var(--bg-panel); 
-            border: 1px solid var(--border); 
-            padding: 25px; 
-            transition: transform 0.3s ease;
-        }
-        .car-card:hover { transform: translateY(-3px); }
-        .car-name { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .car-details { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); }
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .car-card { background: #1a1a1a; border: 1px solid var(--border); padding: 25px; }
+        .car-name { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .car-details { display: flex; justify-content: space-between; font-size: 12px; color: #777; }
 
         /* Стили для вложенных списков */
         .doc-list ul { list-style: none; margin-left: 20px; margin-top: 10px; }
         .doc-list ul li { position: relative; padding-left: 15px; }
-        .doc-list ul li::before { content: '-'; position: absolute; left: 0; color: var(--text-muted); }
+        .doc-list ul li::before { content: '-'; position: absolute; left: 0; color: #666; }
 
         .sub-list { margin-left: 25px; margin-top: 10px; margin-bottom: 10px; }
-        .sub-list li { list-style-type: circle; margin-bottom: 5px; color: var(--text-dim); }
+        .sub-list li { list-style-type: circle; margin-bottom: 5px; }
 
         /* Кнопка реестра транспорта */
         .fleet-register-btn {
             display: inline-flex; align-items: center; gap: 10px;
-            padding: 16px 32px; background: var(--accent); color: var(--bg-body);
+            padding: 16px 32px; background: #fff; color: #000;
             text-decoration: none; font-weight: 800; text-transform: uppercase;
             font-size: 13px; transition: 0.3s; margin-bottom: 20px;
-            border-radius: 4px;
-            white-space: nowrap;
         }
-        .fleet-register-btn:hover { opacity: 0.9; }
-
-        /* === МЕДИА-ЗАПРОСЫ ДЛЯ АДАПТИВНОСТИ === */
-        
-        /* Планшеты и маленькие ноутбуки */
-        @media (max-width: 1200px) {
-            .scroll-container {
-                padding: 40px 60px;
-            }
-            
-            .section-header h1 {
-                font-size: 30px;
-            }
-            
-            .card {
-                padding: 30px;
-            }
-        }
-
-        /* Планшеты */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 280px;
-            }
-            
-            .scroll-container {
-                padding: 40px 50px;
-            }
-            
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .section-header h1 {
-                font-size: 28px;
-            }
-            
-            .top-bar {
-                padding: 0 30px;
-            }
-        }
-
-        /* Телефоны */
-        @media (max-width: 768px) {
-            /* Бургер меню */
-            .mobile-menu-btn {
-                display: flex;
-            }
-            
-            .mobile-overlay.active {
-                display: block;
-            }
-            
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                transform: translateX(-100%);
-                z-index: 100;
-                width: 280px;
-                box-shadow: 5px 0 25px var(--shadow);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .app-layout {
-                padding-left: 0;
-            }
-            
-            /* Верхний бар */
-            .top-bar {
-                height: 70px;
-                padding: 0 20px;
-                justify-content: flex-end;
-            }
-            
-            .page-title {
-                font-size: 12px;
-                position: absolute;
-                left: 80px;
-                top: 50%;
-                transform: translateY(-50%);
-                max-width: 150px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            
-            .top-controls {
-                gap: 10px;
-            }
-            
-            .auth-btn {
-                padding: 8px 16px;
-                font-size: 11px;
-            }
-            
-            .theme-toggle {
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-            
-            /* Контент */
-            .scroll-container {
-                padding: 20px;
-                padding-top: 90px;
-            }
-            
-            .section-header {
-                margin-bottom: 40px;
-            }
-            
-            .section-header h1 {
-                font-size: 24px;
-            }
-            
-            .section-header p {
-                font-size: 11px;
-            }
-            
-            .card {
-                padding: 25px 20px;
-                margin-bottom: 30px;
-            }
-            
-            .card h3 {
-                font-size: 18px;
-                margin-bottom: 20px;
-            }
-            
-            .card p, .doc-list li, ol li {
-                font-size: 13px;
-            }
-            
-            /* Сетка машин */
-            .fleet-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            /* Кнопки */
-            .recruit-btn, .fleet-register-btn {
-                padding: 14px 24px;
-                font-size: 12px;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .fleet-register-btn {
-                margin-top: 15px;
-                margin-bottom: 0;
-            }
-            
-            /* Окно входа */
-            .login-box {
-                padding: 30px 25px;
-                width: 95%;
-                max-width: 400px;
-            }
-            
-            .login-title h1 {
-                font-size: 28px;
-            }
-        }
-
-        /* Маленькие телефоны */
-        @media (max-width: 480px) {
-            .top-bar {
-                padding: 0 15px;
-            }
-            
-            .page-title {
-                left: 70px;
-                max-width: 120px;
-            }
-            
-            .scroll-container {
-                padding: 15px;
-                padding-top: 80px;
-            }
-            
-            .section-header h1 {
-                font-size: 22px;
-            }
-            
-            .card {
-                padding: 20px 15px;
-            }
-            
-            .card h3 {
-                font-size: 16px;
-            }
-            
-            .doc-list li {
-                padding-left: 15px;
-            }
-            
-            .doc-list li::before {
-                left: -5px;
-            }
-            
-            table {
-                font-size: 12px;
-            }
-            
-            th, td {
-                padding: 10px;
-            }
-        }
-
-        /* Очень маленькие телефоны */
-        @media (max-width: 360px) {
-            .section-header h1 {
-                font-size: 20px;
-            }
-            
-            .card h3 {
-                font-size: 15px;
-            }
-            
-            .auth-btn {
-                padding: 6px 12px;
-                font-size: 10px;
-            }
-            
-            .theme-toggle {
-                width: 32px;
-                height: 32px;
-            }
-        }
+        .fleet-register-btn:hover { background: #ccc; }
     </style>
 </head>
 <body>
@@ -648,24 +256,16 @@
         </div>
     </div>
 
-    <!-- Кнопка бургер-меню для мобильных -->
-    <div id="mobileMenuBtn" class="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-    </div>
-    
-    <!-- Оверлей для мобильного меню -->
-    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileMenu()"></div>
-
     <div class="app-layout">
         
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>MTF-7 PORTAL</h2>
             </div>
             <div class="nav-area">
                 <div class="nav-category">НАВИГАЦИЯ</div>
                 <div id="navMenu">
-                    <button onclick="switchTab('public'); closeMobileMenu();" class="nav-btn active">
+                    <button onclick="switchTab('public')" class="nav-btn active">
                         <i class="fas fa-globe"></i> Общая информация
                     </button>
                     </div>
@@ -678,14 +278,9 @@
         <main class="content-area">
             <div class="top-bar">
                 <div class="page-title" id="pageTitle">ОБЩАЯ ИНФОРМАЦИЯ</div>
-                <div class="top-controls">
-                    <button id="themeToggle" class="theme-toggle" title="Сменить тему">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button class="auth-btn" onclick="toggleLogin()">
-                        <i class="fas fa-lock"></i> АВТОРИЗАЦИЯ
-                    </button>
-                </div>
+                <button class="auth-btn" onclick="toggleLogin()">
+                    <i class="fas fa-lock"></i> АВТОРИЗАЦИЯ
+                </button>
             </div>
 
             <div class="scroll-container">
@@ -709,7 +304,7 @@
 
                         <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                             <div>
-                                <h4 style="color: var(--accent); margin-bottom: 10px; text-transform: uppercase;">
+                                <h4 style="color: #fff; margin-bottom: 10px; text-transform: uppercase;">
                                     <i class="fas fa-crosshairs"></i> Tactical Response Team
                                 </h4>
                                 <p style="font-size: 13px;">
@@ -717,7 +312,7 @@
                                 </p>
                             </div>
                             <div>
-                                <h4 style="color: var(--accent); margin-bottom: 10px; text-transform: uppercase;">
+                                <h4 style="color: #fff; margin-bottom: 10px; text-transform: uppercase;">
                                     <i class="fas fa-search"></i> Criminal Investigation Dept
                                 </h4>
                                 <p style="font-size: 13px;">
@@ -742,12 +337,584 @@
                     </div>
                     
                     <div id="fleetContainer" class="fleet-grid">
-                        <div style="color: var(--text-dim);">Загрузка данных с сервера...</div>
+                        <div style="color: #666;">Загрузка данных с сервера...</div>
                     </div>
                 </section>
 
-                <!-- Остальные секции (сокращены для экономии места, но в реальном коде они все здесь) -->
-                <!-- ... -->
+                <section id="traineeSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-user-graduate"></i> Для стажера</h1>
+                        <p>Материалы для прохождения стажировки</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-door-open"></i> Введение</h3>
+                        <p>Поздравляю тебя, стажер! Ты - один из немногих, кто смог достичь то, что скрыто от глаз обычных людей и в частности обычных офицеров. Это Мобильная Опергруппа, если говорит сокращенно - MTF-7. Мы организация куда серьезнее, чем те, что вы видели ранее. Мы действуем согласно внутренним регламентам и общепринятым правилам МВД. Ваша первая задача - понять, что здесь ошибок не прощают, действовать здесь нужно максимально четко. Чтобы полноценно приступить к обязанностям младшего агента, а уже затем полностью осознать структуру всей организации, вы должны изучить темы, которые будут указаны ниже.</p>
+                        <p>После прохождения общей стажировки, вам придется выбрать подразделение. Далее вы начнете следующий этап обучения для работы по выбранному направлению. В будущем, вы сможете перейти в другое подразделение, но вам придется пройти новый курс обучения. Один и тот же агент сможет нести службу сразу в двух направлениях, если имеет 2 пройденных курса обучения и изъявит желание.</p>
+                        
+                        <p><strong>Для успешной сдачи стажировки, вам нужно знать первоначальную информацию:</strong></p>
+                        <ul class="doc-list">
+                            <li>Структура MTF-7;</li>
+                            <li>Внутренний устав группы;</li>
+                            <li>Система наказания для агента.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="structureSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-sitemap"></i> Структура MTF-7</h1>
+                        <p>Иерархия и подразделения организации</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-building"></i> Основная информация</h3>
+                        <p>Мобильная опергруппа (MTF-7) является организацией, стремящейся различными методами устранить преступность и все ее источники. Организация состоит из высококвалифицированных агентов. Основная цель стажировки -- подготовить вас к самостоятельной и командной работе в качестве агента MTF-7, оснастив вас необходимыми знаниями, навыками и умениями. В своем составе организация содержит различные подразделения, задачи которых для каждого разные.</p>
+                        
+                        <p><strong><i class="fas fa-crosshairs"></i> Tactical Response Team</strong> — Подразделение быстрого реагирования, выполняющее высокорисковые операции: задержания вооружённых лиц, штурмы, зачистки зданий, сопровождение спецопераций и пресечение непосредственных угроз. Контролирует действия преступных лиц, состоящих в мафиозных организациях и преступных группировках.</p>
+                        
+                        <p><strong><i class="fas fa-search"></i> Criminal Investigation Department</strong> — Оперативно-следственный отдел, который занимается анализом преступной активности, сбором улик, допросами, подготовкой материалов и сопровождением дел, связанных с деятельностью MTF-7.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-id-badge"></i> Все должности организации</h3>
+                        <ul class="doc-list">
+                            <li><strong>COMMANDER [C.MTF-7]</strong> — Высшее должностное лицо MTF-7, определяющее стратегию развития и утверждающее внутренние протоколы. Несет персональную ответственность за сохранение режима секретности и автономность подразделения. Единолично принимает решения о санкционировании спецопераций высшего риска и проведении кадровых чисток.</li>
+                            <li><strong>SUB. COMMANDER [SUB.MTF-7]</strong> — Второе лицо в иерархии, осуществляющее оперативное управление личным составом и контроль дисциплины. Курирует работу подразделений, отвечает за проверку отчетности и квалификацию сотрудников. Обладает всей полнотой власти и правом принятия решений в отсутствие командира.</li>
+                            <li><strong>SENIOR AGENT [S.MTF-7]</strong> — Элитный оперативник, выполняющий функции полевого командира во время штурмов и рейдов. Руководит тактическими группами, координирует действия на местах. Отвечает за обучение младшего состава. Выдает наказания агентам.</li>
+                            <li><strong>AGENT [AG.MTF-7]</strong> — Основная боевая единица с полным допуском к информации и тайнам. В зависимости от специализации выполняет задачи по штурму укреплений или скрытому наблюдению. Обязан в совершенстве знать все внутренние уставы, протокола, инструкции реагирования и прочую информацию, связанную с группой.</li>
+                            <li><strong>JUNIOR AGENT [J.MTF-7]</strong> — Сотрудник, успешно прошедший Академию и получивший личный позывной, но находящийся на испытательном сроке. В этот период определяет свою специализацию для дальнейшей службы. Допускается к участию в операциях под надзором старших офицеров, выполняя задачи огневой поддержки.</li>
+                            <li><strong>TRAINEE [TR.MTF-7]</strong> — Кандидат, проходящий отбор в ряды MTF без доступа к секретным архивам и федеральной базе данных. Основная задача --- изучение базовых деталей и подготовка к экзаменам. Запрещено участвовать в боевых операциях.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-user-tie"></i> Руководство</h3>
+                        <p>Руководство Мобильной опергруппы состоит из Командира и его Заместителя. Командир - высшее руководящее лицо Мобильной опергруппы, приказы которого должны строго выполняться всеми агентами без обсуждения. Заместитель Командира временно исполняет все обязанности Командира Мобильной опергруппы в случае отсутствия первого. Приказы Заместителя Командира также должны строго выполняться всеми агентами без обсуждения. Приказы руководства не должны переходить законную черту.</p>
+                        <p>Во время проведения определенных специальных операций Старший Агент имеет право отдавать приказы должностям ниже во время отсутствия руководства или с его разрешения.</p>
+                        <p>Каждый агент мобильной опергруппы должен хранить в тайне всю информацию о себе, а также всю информацию об отделе во избежания ее утечки в открытый доступ.</p>
+                    </div>
+                </section>
+
+                <section id="charterSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-book"></i> Внутренний устав группы</h1>
+                        <p>Нормативно-правовая база сотрудника</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-file-contract"></i> Раздел Ⅰ. Общие положения</h3>
+                        <ol class="doc-list">
+                            <li>Устав для агентов MTF-7 - главный документ Мобильной опергруппы в котором отражены правила и обязанности всех агентов MTF-7. Нарушение данного устава недопустимо каждому агенту.</li>
+                            <li>Мобильная оперативная группа является секретной организацией, цель которой - установление порядка во всем штате.</li>
+                            <li>Мобильная опергруппа не является экстремистской организацией.</li>
+                            <li>Мобильная опергруппа не предусматривает вмешательства в дела Министерства Обороны без необходимости.</li>
+                            <li>Мобильная опергруппа не предусматривает применение силы или угрозы без необходимости.</li>
+                            <li>Агентам мобильной опергруппы гарантируется анонимность со стороны высшего руководства.</li>
+                            <li>Агентам мобильной опергруппы предоставляется медицинская помощь, убежище в случае крайней необходимости. Все затраты берет на себя руководство.</li>
+                            <li>Все действия агентов мобильной опергруппы основываются на положениях данного устава.</li>
+                            <li>Данный устав является дополнением основному уставу Министерства Внутренних Дел исключительно для агентов MTF-7. Придерживаться вы обязаны правилам и запретам как первого, так и второго.</li>
+                            <li>Разглашение любой информации для Стажера или Агента строго настрого запрещено. За любую утечку информации, вы можете понести наказание, которое будет зависеть от важности той или иной информации.</li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-balance-scale"></i> Раздел Ⅱ. Права и обязанности агентов</h3>
+                        <ol class="doc-list">
+                            <li>Агент обязуется носить при себе необходимый минимум снаряжения для выполнения своих прямых должностных обязанностей.</li>
+                            <li>Агент обязан знать и соблюдать действующее законодательство и нормативно-правовые акты штата.</li>
+                            <li>У всех агентов мобильной опергруппы имеются равные права. Никто из агентов не должен нарушать личные права своих коллег.</li>
+                            <li>У агента есть право на приобретение имущества (Дом, Автомобиль, Бизнес и тд.).</li>
+                            <li>У агента есть право на использование транспорта Мобильной опергруппы в установленных протоколом MTF-7 целях. Агент обязан следить за транспортом опергруппы, а также бережно относиться к нему.</li>
+                            <li>Агент опергруппы имеет право на пользование оружием в установленных протоколом MTF-7 целях. Агент не имеет право на использование оружия в личных целях.</li>
+                        </ol>
+                        <p><strong>В обязанности агентов мобильной опергруппы входит:</strong></p>
+                        <ul class="doc-list">
+                            <li>Контроль за выполнением законодательных актов;</li>
+                            <li>Ликвидация различных форм преступлений;</li>
+                            <li>Расследование секретных дел, недоступных для гражданских лиц;</li>
+                            <li>Помощь Министерству Обороны штата, если на то имеется необходимость;</li>
+                            <li>Проведение спецопераций в целях контроля за штатом;</li>
+                            <li>Защита и сопровождения государственных лиц.</li>
+                        </ul>
+                        <p>Агент обязан соблюдать законы государства.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-fist-raised"></i> Раздел Ⅲ. Применение силы и оружия</h3>
+                        <p>Всего существует пять стадий применения силы:</p>
+                        <ol>
+                            <li><strong>Первая стадия — присутствие агента.</strong> При нахождении агента вызывается психологическое воздействие.</li>
+                            <li><strong>Вторая стадия — устные приказы, замечание.</strong> Случаются ситуации, что малейшего замечания хватает, для нужного давления для прекращения запрещенных деяний.</li>
+                            <li><strong>Третья стадия — применение физической силы, воздействий.</strong> Приемы рукопашного бока, заломы и так далее.</li>
+                            <li><strong>Четвертая стадия — использование спецсредств.</strong> К спецсредствам относятся: дубинка, наручники, тазер, газовая граната. Спецсредства используются, если подозреваемый оказывает сопротивление при аресте, выше вас ростом, больше массой. Электрошокер используется с целью обездвижения подозреваемого, в случае его наступления.</li>
+                            <li><strong>Пятая стадия — применение летального, огнестрельного оружия.</strong> Данная стадия применяется в случае прямой угрозы агенту или гражданскому лицу.</li>
+                        </ol>
+                        <br>
+                        <ol class="doc-list">
+                            <li>Агент имеет право на использование оружия в целях ликвидации преступного лица, если это предусмотрено законодательством штата и уставом МВД.</li>
+                            <li>Агент имеет право сделать предупредительный выстрел в целях остановки преступника или преступных действий.</li>
+                            <li>Агент обязан держать свое оружие в боевой готовности при различных ситуациях.</li>
+                            <li>Агент имеет право открыть огонь на поражение в случае опасности для его жизни, жизни офицеров полиции или гражданских со стороны преступных лиц.</li>
+                            <li>Агент имеет право на пользование оружия во время проведения различных спецопераций.</li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-calendar-alt"></i> Раздел Ⅳ. График работы</h3>
+                        <ol class="doc-list">
+                            <li>График работы:<br>
+                                Будние дни: 09:00 - 22:00<br>
+                                Суббота: 09:00 - 21:00<br>
+                                Воскресенье выходной.</li>
+                            <li>Агент имеет право на отдых в течении одного часа раз в сутки с разрешения руководства.</li>
+                            <li>Руководство имеет право обнулить выходной день агента в случае крайней необходимости. В данном случае руководство компенсирует потерю выходного денежными средствами, выделенными агенту.</li>
+                            <li>При покидании мобильной опергруппы агент подписывает договор о неразглашении информации. В случае нарушения договора в отношении агента будут предусмотрены необходимые меры. Агент обязан предупредить руководство о покидании опергруппы.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section id="punishmentSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-gavel"></i> Система наказаний для агентов</h1>
+                        <p>Дисциплинарные меры и взыскания</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Виды наказаний</h3>
+                        <p>Существует 4 вида внутренних наказаний для агентов, получить которые они могут за нарушения различного типа:</p>
+                        <ol class="doc-list">
+                            <li>Беседа;</li>
+                            <li>Выговор;</li>
+                            <li>Понижение в должности;</li>
+                            <li>Исключение из рядов MTF-7.</li>
+                        </ol>
+                        
+                        <p><strong>Основные деяния, за которые агент может понести наказание:</strong></p>
+                        <p>Самое важное - намеренное разглашение информации лицам, которые не должны были этого знать. За это Вы можете понести самую сильную меру наказания. Другой же случай, если вы сделали это не намеренно. Эти обстоятельства могут быть учтены при выдаче Вам взыскания.</p>
+                        <p>В других случаях, наказания выбираются по мере совершенных правонарушений, так что ваше поведение должно быть безупречным.</p>
+                        
+                        <p><strong><i class="fas fa-info-circle"></i> Примечание:</strong> данные наказания являются только для агентов и не имеют никакого отношения к общей системе наказания МВД, тобишь, получая выговор, он не выйдет за пределы MTF. Понижение в должности не является понижением в звании в своем департаменте (если вы находились на должности агента в группе, и по какой то причине вас понижают в должности, то вместо агента вы становитесь младшим агентом).</p>
+                    </div>
+                </section>
+
+                <section id="cidSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-search"></i> Протокол действий для Criminal Investigation Department</h1>
+                        <p>Криминалистика и следственные мероприятия</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-project-diagram"></i> РАЗДЕЛ I. СТРУКТУРА, ПРОЦЕСС РАССЛЕДОВАНИЯ И РАБОТА НА МЕСТЕ ПРЕСТУПЛЕНИЯ</h3>
+                        
+                        <h4><i class="fas fa-bullseye"></i> 1.1. Определение и цели</h4>
+                        <p>Криминалистика --- это фундамент работы CID. Это наука о технических средствах и методах, применяемых для обнаружения, фиксации и использования доказательств. Система специальных знаний о технических средствах, тактических приемах и методах, применяемых для:</p>
+                        <ul class="doc-list">
+                            <li>Обнаружения (поиск скрытых улик).</li>
+                            <li>Фиксации (процессуальное закрепление, чтобы улика имела силу в суде).</li>
+                            <li>Изъятия (физическое сохранение).</li>
+                            <li>Исследования (экспертиза).</li>
+                        </ul>
+                        
+                        <p><strong>Ключевые объекты изучения:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Преступная деятельность:</strong> Механизмы подготовки преступления, способы его совершения и методы сокрытия следов (уничтожение улик, инсценировки).</li>
+                            <li><strong>Криминалистическая деятельность:</strong> Работа следователей по сбору базы доказательств и экспертов по их анализу.</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-tasks"></i> 1.2. Основные задачи сотрудника CID</h4>
+                        <ul class="doc-list">
+                            <li>Разработка и внедрение эффективных методов работы с доказательствами.</li>
+                            <li>Анализ ошибок, допущенных при производстве следственных действий, для их исключения в будущем.</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-binoculars"></i> 1.3. Объекты изучения</h4>
+                        <ul class="doc-list">
+                            <li>Преступная деятельность.</li>
+                            <li>Криминалистическая деятельность (следствие, экспертиза, оперативно-розыскная деятельность).</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-clipboard-list"></i> РАЗДЕЛ II. РЕГЛАМЕНТ РАССЛЕДОВАНИЯ</h3>
+                        <p>Расследование состоит из 5 четко определенных этапов:</p>
+                        <ol class="doc-list">
+                            <li>Сбор улик и информации, опрос свидетелей.</li>
+                            <li>Разработка первичной версии.</li>
+                            <li>Составление кейс-файла.</li>
+                            <li>Поиск и задержание подозреваемого.</li>
+                            <li>Допрос.</li>
+                        </ol>
+                        
+                        <h4><i class="fas fa-lightbulb"></i> 2.1. Разработка первичной версии</h4>
+                        <p>На данном этапе необходимо сделать выводы по имеющимся уликам и попытаться воссоздать картину произошедшего. Агентам дается полная свобода действий для того, чтобы они избрали наиболее эффективную тактику расследования. Разрешается взаимодействие с другими структурами.</p>
+                        <p>Главной целью в построении первичной версии служит установление способа совершения преступления, его мотивов, сужение круга лиц, которые могут быть причастны к совершению преступления. Первичная версия зачастую оказывается неверной, однако может подтолкнуть агентов к истинной версии произошедшего.</p>
+                        <p>Важно опираться именно на собранные улики, так как они дают более объективную информацию, нежели предположения или теории. Если улики недоступны, так как находятся на анализе, можно воспользоваться лишь их списком, но не делать выводов относительно причастных лиц. Это лучше сделать после завершения анализа.</p>
+                        
+                        <h4><i class="fas fa-folder-open"></i> 2.2. Составление Кейс-файла</h4>
+                        <p>Кейс-файл --- материалы какого-либо дела. Они содержат в себе абсолютно всю информацию о текущем расследовании: улики, версии, протоколы и так далее. Для ускорения хода расследования и обеспечения оперативного взаимодействия агенты обязаны вносить в кейс-файл всю информацию, имеющуюся у них по данному расследованию. Один файл может содержать в себе информацию от нескольких агентов, участвующих в расследовании.</p>
+                        <p>Каждый кейс-файл имеет определенный приоритет. Он показывает важность текущего расследования.</p>
+                        <p>После закрытия дела кейс-файл подписывается специальным ZIP-кодом и отправляется в архив.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-crime-scene"></i> РАЗДЕЛ III. РАБОТА НА МЕСТЕ ПРЕСТУПЛЕНИЯ</h3>
+                        
+                        <h4><i class="fas fa-search-location"></i> 3.1. Работа на месте преступления</h4>
+                        <p>Сразу после прибытия на место преступления агенты должны начать сбор всевозможных улик, прямо или косвенно указывающих на подозреваемого. Стоит помнить, что чем раньше были собраны улики, тем больше информации можно получить. Некоторые виды улик имеют свойство стираться, высыхать или ещё каким-либо способом становиться непригодными для ведения следствия.</p>
+                        
+                        <p><strong>Основные улики, которые может обнаружить агент на месте преступления:</strong></p>
+                        <ul class="doc-list">
+                            <li>Отпечатки пальцев.</li>
+                            <li>Следы резины, рисунки протектора автомобилей.</li>
+                            <li>Кровь.</li>
+                            <li>Пятна масла или бензина.</li>
+                            <li>Гильзы.</li>
+                            <li>Пули.</li>
+                            <li>Выброшенное неподалёку оружие и/или орудие преступления.</li>
+                            <li>Оставленные преступником бытовые предметы: салфетки, жвачка, газеты и так далее.</li>
+                            <li>Записи с камер видеонаблюдения. Сюда же относятся записи с видеорегистраторов в автомобилях.</li>
+                        </ul>
+                        
+                        <p>Изъятые предметы помещаются в специальный герметичный контейнер. Жидкости стоит забирать вместе с материалом, на котором они находятся. Отпечатки пальцев собираются при помощи прозрачной ленты и переносятся на специальную карту. Все улики после сбора должны быть помещены в соответствующие условия, чтобы сохранить их пригодными для дальнейшего анализа сотрудниками ФБР.</p>
+                        
+                        <p>Также стоит помнить про свидетелей. В отличие от улик человек может сообщить гораздо больше информации. Не обязательно проводить опрос на месте преступления: можно собрать контакты и спустя некоторое время вызвать свидетеля в офис. Важно письменно или на диктофон фиксировать всю информацию, полученную от свидетеля.</p>
+                        
+                        <p>Не стоит всецело полагаться на показания свидетелей, так как в них большую роль играет человеческий фактор. Однако, зачастую в ходе опроса всплывают множество полезных сведений.</p>
+                        
+                        <h4><i class="fas fa-camera"></i> 3.2. Судебная фотография</h4>
+                        <p>Фотосъемка выполняет функцию запечатления и исследования. Виды съемки:</p>
+                        <ol class="doc-list">
+                            <li><strong>Ориентирующая:</strong> Снимается объект с привязкой к местности (ориентиру).
+                                <ul class="sub-list">
+                                    <li><strong>Круговая панорама:</strong> Съемка с одной точки вокруг оси. Минус: искажает расстояния, плохо для исследования.</li>
+                                    <li><strong>Линейная панорама:</strong> Передвижение вместе с камерой вдоль объекта (например, длинного дома).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Обзорная:</strong> Объект с разных сторон, когда ориентирующей недостаточно.</li>
+                            <li><strong>Узловая:</strong> Отображение следов с частью прилегающей территории (пример: взломанная дверь целиком).</li>
+                            <li><strong>Детальная:</strong> Макросъемка самих следов.</li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-shoe-prints"></i> РАЗДЕЛ IV. ТРАСОЛОГИЯ</h3>
+                        
+                        <h4><i class="fas fa-atom"></i> 4.1. Фундаментальные понятия</h4>
+                        <p>След --- это любое материальное изменение обстановки. В трасологии под "следом" понимают как отпечаток (узкий смысл), так и последствия действий (широкий смысл --- например, разбросанные вещи).</p>
+                        
+                        <p><strong>Классификация следов:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Материальные:</strong> Физическое отображение одного объекта на другом (отпечаток обуви, след взлома).</li>
+                            <li><strong>Идеальные:</strong> Мысленный образ, сохранившийся в памяти свидетеля.</li>
+                            <li><strong>Виртуальные:</strong> Цифровые следы (IP-адреса, логи серверов, биллинг звонков).</li>
+                            <li><strong>Биологические:</strong> Следы рук (потожировые), кровь, слюна.</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-fingerprint"></i> 4.2. Принципы идентификации</h4>
+                        <p>Трасология базируется на том, что каждый объект индивидуален благодаря микрорельефу.</p>
+                        
+                        <ul class="doc-list">
+                            <li><strong>Идентификация целого по частям:</strong> Критически важна при ДТП и взрывах.
+                                <ul class="sub-list">
+                                    <li>Пример: На месте наезда найдены осколки фары. У подозреваемого разбита фара. Если линия разлома совпадает --- это 100% доказательство. Это возможно только если есть общая линия разделения (разлом, разрез, разрыв).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Индивидуальность микрорельефа:</strong>
+                                <ul class="sub-list">
+                                    <li>Любой инструмент оставляет уникальные царапины.</li>
+                                    <li>Проблема износа: Объект меняется со временем. Пуля, выпущенная из ствола первым выстрелом, и пуля от 1000-го выстрела будут иметь разные следы, так как ствол "стачивается". Идентификация возможна только в пределах определенного временного периода.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-lock"></i> РАЗДЕЛ V. ТЕХНИКО-КРИМИНАЛИСТИЧЕСКОЕ ИССЛЕДОВАНИЕ ВЗЛОМА</h3>
+                        <p>Агент должен уметь определить квалификацию взломщика (профессионал или любитель) по типу оставленных следов и способу вскрытия.</p>
+                        
+                        <h4><i class="fas fa-key"></i> 5.1. Классификация замков</h4>
+                        <p>Понимание конструкции замка позволяет сузить круг подозреваемых (инструмент подбирается под замок).</p>
+                        
+                        <p><strong>1. По способу крепления:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Навесные (Амбарные):</strong> Самые примитивные.</li>
+                            <li><strong>Накладные:</strong> Корпус не входит в тело двери (часто в старых дверях или мебели).</li>
+                            <li><strong>Врезные:</strong> Корпус полностью скрыт в двери.</li>
+                        </ul>
+                        
+                        <p><strong>2. По механизму:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Цилиндровые:</strong> Самые распространенные. Уязвимое место --- личинка.</li>
+                            <li><strong>Сувальдные:</strong> "Сейфовые" замки.</li>
+                            <li><strong>Дисковые:</strong> Взламываются часто "свертышем" (инструмент из прочной стали).</li>
+                            <li><strong>Реечные:</strong> Примитивные, открываются даже подручными средствами (веткой, струной).</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-tools"></i> 5.2. Методы взлома и противодействие</h4>
+                        <p>Следы на месте преступления указывают на метод:</p>
+                        
+                        <p><strong>1. Силовой:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Высверливание:</strong> След остается в нижней части цилиндра.</li>
+                            <li><strong>Химический/Термический:</strong> Жидкий азот (заморозка и удар) или кислота.</li>
+                            <li><strong>Свёртыш:</strong> Использование заготовки из сверхпрочной стали для срезания штифтов поворотом.</li>
+                        </ul>
+                        
+                        <p><strong>2. Интеллектуальный:</strong></p>
+                        <ul class="doc-list">
+                            <li>Использование отмычек, бампинг, подбор ключа.</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-search-plus"></i> 5.3. Следы взлома на преградах</h4>
+                        <ol class="doc-list">
+                            <li><strong>Следы давления:</strong> Вмятины. Образуются при использовании лома/фомки как рычага (отжим двери).</li>
+                            <li><strong>Следы скольжения (трения):</strong> Царапины. Возникают, когда инструмент соскальзывает или просовывается (например, нож для скидывания крючка).</li>
+                            <li><strong>Следы разреза/распила:</strong>
+                                <ul class="sub-list">
+                                    <li><strong>Простой разрез:</strong> Орудие с одной кромкой (топор, стамеска).</li>
+                                    <li><strong>Встречный разрез:</strong> Орудие с двумя кромками (кусачки, ножницы по металлу).</li>
+                                    <li><strong>Сверление:</strong> Характерная стружка. Перовое сверло оставляет отверстия большого диаметра.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Специфические методы проникновения через окна:</strong>
+                                <ul class="sub-list">
+                                    <li>Использование "пластыря" (ткань с липким веществом --- мед/солидол) для бесшумного разбития стекла. Звук глушится, осколки остаются на ткани.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-bullseye"></i> РАЗДЕЛ VI. СУДЕБНАЯ БАЛЛИСТИКА</h3>
+                        <p>Критически важный раздел для расследования перестрелок. Баллистика позволяет связать пулю, гильзу и ствол.</p>
+                        
+                        <h4><i class="fas fa-gun"></i> 6.1. Классификация огнестрельного оружия</h4>
+                        <p>Оружие признается огнестрельным при наличии 4 признаков: ствол, взрывчатое вещество, устройство воспламенения и достаточное поражающее действие.</p>
+                        
+                        <p><strong>Типология:</strong></p>
+                        
+                        <p><strong>1. По назначению:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Боевое/Служебное:</strong> Полицейское и армейское вооружение.</li>
+                            <li><strong>Гражданское:</strong> Оружие самообороны.</li>
+                            <li><strong>Криминальное:</strong> Кустарное производство (самоделы, обрезы, переделки). Характеризуется нестабильными характеристиками и низким качеством.</li>
+                        </ul>
+                        
+                        <p><strong>2. По каналу ствола:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Гладкоствольное:</strong> Ровные стенки. Может иметь сужения.</li>
+                            <li><strong>Нарезное:</strong> Имеет винтовые нарезы (обычно 4 и более) для стабилизации пули.</li>
+                            <li><strong>Полигональное:</strong> Ствол в форме правильного многоугольника (редкость, пример G-11).</li>
+                        </ul>
+                        
+                        <p><strong>3. По автоматизации:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Автоматическое:</strong> Стреляет очередями, пока нажат спуск.</li>
+                            <li><strong>Полуавтоматическое (Самозарядное):</strong> Один выстрел --- одно нажатие (большинство пистолетов, Glock, Desert Eagle).</li>
+                            <li><strong>Неавтоматическое:</strong> Требует ручной перезарядки после каждого выстрела (болтовые винтовки, помповые дробовики).</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-microscope"></i> 6.2. Следообразование</h4>
+                        <p>Каждый ствол оставляет уникальный "отпечаток" на боеприпасах.</p>
+                        
+                        <p><strong>1. Следы на ГИЛЬЗЕ:</strong> Наиболее информативны для экспертизы.</p>
+                        <ul class="doc-list">
+                            <li><strong>След бойка:</strong> Вмятина на капсюле (в центре или с краю).</li>
+                            <li><strong>След патронного упора:</strong> Отпечаток на донышке гильзы в момент выстрела (из-за давления газов).</li>
+                            <li><strong>След выбрасывателя:</strong> Царапины на закраине гильзы при извлечении.</li>
+                            <li><strong>След отражателя:</strong> Вмятина на донышке при вылете гильзы из окна затвора.</li>
+                        </ul>
+                        
+                        <p><strong>2. Следы на ПУЛЕ:</strong></p>
+                        <ul class="doc-list">
+                            <li><strong>Первичные:</strong> Царапины от микрорельефа ствола до входа в нарезы.</li>
+                            <li><strong>Вторичные:</strong> Следы от самих нарезов. Обычно перекрывают первичные. По ним определяют модель оружия.</li>
+                        </ul>
+                        
+                        <p><strong>3. Следы ДРОБИ:</strong> На дробинах могут оставаться следы от соседних дробин (контактные пятна) и следы от канала ствола (на крайних дробинах). Теоретически позволяют определить калибр.</p>
+                        
+                        <h4><i class="fas fa-crime-scene"></i> 6.3. Работа с оружием на месте преступления</h4>
+                        <ol class="doc-list">
+                            <li><strong>Фиксация:</strong> Сначала фотосъемка и схема, только потом --- касание.</li>
+                            <li><strong>Изъятие:</strong> Брать только в перчатках за места, где наименее вероятны отпечатки (рифленые накладки рукояти). За спусковую скобу брать не рекомендуется, там могут быть следы.</li>
+                            <li><strong>Проверка:</strong> Определить, взведен ли курок.</li>
+                            <li><strong>Разрядка:</strong> Если оружие заряжено --- разрядить в штатном режиме. Если затвор заклинило --- вставить мягкую прокладку между курком и бойком, чтобы исключить случайный выстрел при транспортировке.</li>
+                            <li><strong>Консервация:</strong> Чистить ствол НЕЛЬЗЯ. Дульный срез закрывается колпачком (бумага/ткань) для сохранения нагара и микрочастиц.</li>
+                        </ol>
+                        
+                        <h4><i class="fas fa-bullseye"></i> 6.4. Определение траектории</h4>
+                        <p>Методы установления места стрелка:</p>
+                        <ol class="doc-list">
+                            <li><strong>Бумажная трубка:</strong> Прикладывается к пулевому отверстию (на малых дистанциях).</li>
+                            <li><strong>Нить:</strong> Натягивается от пробоины.</li>
+                            <li><strong>Лазер:</strong> Современный метод. Важно учитывать рикошеты и деформацию пули.</li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-pen-fancy"></i> РАЗДЕЛ VII. ПОЧЕРКОВЕДЕНИЕ</h3>
+                        <p>Используется для анализа записок с угрозами, предсмертных записок и поддельных документов.</p>
+                        
+                        <p><strong>Основные принципы:</strong></p>
+                        <ol class="doc-list">
+                            <li><strong>Индивидуальность:</strong> Почерк уникален. Формируется под влиянием:
+                                <ul class="sub-list">
+                                    <li><strong>Объективных факторов:</strong> Условия обучения, освещение, парта.</li>
+                                    <li><strong>Субъективных факторов:</strong> Анатомия кисти, зрение, состояние мышц.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Динамическая устойчивость:</strong> Почерк сохраняет свои признаки во времени, но может меняться из-за:
+                                <ul class="sub-list">
+                                    <li>Возраста (старческий почерк).</li>
+                                    <li>Практики (чем больше пишешь, тем автоматизированнее навык).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Избирательная изменчивость:</strong> Изменение почерка под влиянием стресса, алкоголя, неудобной позы или намеренного искажения. Задача эксперта --- отличить намеренное искажение от естественного.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section id="trtSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-crosshairs"></i> Протокол действий для Tactical Response Team</h1>
+                        <p>Тактика ведения боя и штурма</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-car-crash"></i> 1. 10-66 (Трафик-стоп повышенного риска)</h3>
+                        <p>Осуществляется по причинам:</p>
+                        <ol class="doc-list">
+                            <li>Если водитель не выполняет требования агента.</li>
+                            <li>Если есть угроза применения оружия со стороны водителя.</li>
+                            <li>Если водитель данного транспортного средства находится в федеральном розыске.</li>
+                        </ol>
+                        
+                        <p><strong>Действия сотрудников:</strong></p>
+                        <ol class="doc-list">
+                            <li>Немедленно сообщить в рацию.</li>
+                            <li>Вызвать юнитов на 10-66.</li>
+                            <li>По приезду юнитов, кто-то должен взять все под свой контроль.</li>
+                            <li>Заставить водителя выйти из автомобиля, и поднять руки вверх.</li>
+                        </ol>
+                        
+                        <p><strong>Если водитель выполнил требования, то можно смело проводить его арест:</strong></p>
+                        <ol class="doc-list">
+                            <li>Заставить выйти из т/с под прицелом оружия.</li>
+                            <li>Скрутить подозреваемого.</li>
+                            <li>Надеть на него наручники, после чего посадить на заднее сиденье служебного автомобиля.</li>
+                            <li>Доставить в ближайший участок.</li>
+                        </ol>
+                        
+                        <p>Если водитель открыл огонь, то обязательно нужно открыть ответный огонь на поражение.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-handcuffs"></i> 2. Арест преступных лиц [Без агрессии со стороны преступника]</h3>
+                        <p>Для задержания и последующего ареста подозреваемого у агентов обязано быть транспортное средство [Т/с опергруппы или полиции].</p>
+                        <p>Во время всего мероприятия у агентов должна быть маска на лице. Агент не должен снимать маску ни по какому требованию преступных лиц.</p>
+                        
+                        <p><strong>Процедура:</strong></p>
+                        <ol class="doc-list">
+                            <li>Останавливаете транспортное средство.</li>
+                            <li>Представляетесь, требуете документы или пробиваете подозреваемого по КПК (если подозреваемый не в маске).</li>
+                            <li>Далее передаете ордер на арест, говоря, что тот находится в федеральном розыске.</li>
+                            <li>После чего надеваете на подозреваемого наручники и садите в автомобиль.</li>
+                            <li>При попытке бегства - розыск по У.К. 9.3.</li>
+                            <li>Агент обязан зачитать правило "Миранды".</li>
+                        </ol>
+                        
+                        <p>Если подозреваемый не садится в автомобиль - ликвидация по У.К. 9.3. Если подозреваемый в розыске, но он находится в маске, то останавливаете только если было замечено нарушение У.К./А.К. (5.2 А.К. не в счет).</p>
+                        <p>Вы - агенты организации, недоступной для обычных людей, поэтому старайтесь исключить лишние разговоры перед подозреваемыми.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-skull-crossbones"></i> 3. Ликвидация преступных лиц [Агрессия со стороны преступника]</h3>
+                        <p>Процесс задержания тот же, что и во втором пункте этого раздела.</p>
+                        <p>В случае, если подозреваемый имеет при себе оружие - приказывайте бросить его на землю, если ваши требования игнорируют - объявляйте в розыск по У.К. 9.1.</p>
+                        <p>Поскольку ликвидация по 9.1 У.К. с недавнего времени запрещена, пытайтесь вести переговоры с подозреваемым. Если он отказывается взаимодействовать, можете использовать спец. технику департамента, сбивать его с ног (это делать разрешено правилами сервера, если на то есть причина).</p>
+                        <p>В случае попытки открыть огонь или в случае открытия огня со стороны подозреваемого - ликвидируйте на месте по У.К. 2.2.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-user-shield"></i> 4. Сопровождение и охрана государственных лиц</h3>
+                        <p>У агентов обязана быть маска на лице во время кортежа и охраны. Маску не снимать ни при каких обстоятельствах, будь то требование гражданских или же государственных лиц.</p>
+                        <p>Докладывайте об охране в рацию департамента. Разговоры во время кортежа или охраны исключить.</p>
+                        <p>Переговоры только между агентами и только на волне рации департамента. Кортеж осуществляется на транспортных средствах группы или полиции.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-user-secret"></i> 5. Раскрытие дел, недоступных для гражданских лиц и лиц гос. организаций</h3>
+                        <p>После того, как появилось дело, на него отправляются агенты мобильной опергруппы.</p>
+                        <p>Часть агентов является группой зачистки, вторая - группой расследования.</p>
+                        
+                        <p><strong>Группа зачистки обязана:</strong></p>
+                        <ul class="doc-list">
+                            <li>Убрать всех государственных лиц и гражданских лиц, являющихся свидетелями, с территории.</li>
+                            <li>Помните, что вы не должны выдавать любую информацию, касающуюся группы тактического реагирования.</li>
+                            <li>Прикажите им, чтобы они покинули территорию, большего не надо.</li>
+                            <li>Не забывайте оцепить территорию.</li>
+                            <li>В случае игнорирования - арест по У.К. 10.1.</li>
+                        </ul>
+                        
+                        <p>У каждого агента (группа зачистки, группа расследования) обязана быть маска. Группа расследования в свою очередь раскрывает дело (RP отыгровки).</p>
+                        <p>В случае, если территория обследована и можно ее покидать - убираете ограждения и покидаете территорию, не забывая про то, что никакую информацию вы не выдаете. Любая утечка может привести к серьезным последствиям.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-door-closed"></i> 6. Ведение штурма</h3>
+                        <p>Штурм - одно из средств агентов мобильной опергруппы, предназначенное для урегулирования ситуации. Штурм применяется при освобождении заложника, уничтожении преступных группировок и в прочих подобных ситуациях.</p>
+                        <p>При штурме помещений с заложником или при захвате вооруженного преступника возможно применение следующего тактического способа:</p>
+                        
+                        <ul class="doc-list">
+                            <li><strong>Головной агент (самый первый),</strong> имеющий при себе дробовик, отстреливает замок и петли, далее выносит дверь и отходит в сторону для того, чтобы остальные агенты могли зайти на объект. Головной агент, после того как все зашли внутрь, заходит в здание самым последним.</li>
+                            <li><strong>Первый агент,</strong> который зашел в здание, быстро осматривает помещение, в случае обнаружения враждебной цели - ликвидирует ее.</li>
+                            <li><strong>Второй агент,</strong> зашедший в здание после первого, двигается в противоположном направлении от первого, действуя также как предыдущий - при обнаружении враждебной цели идет ликвидация.</li>
+                            <li><strong>Агенты,</strong> идущие после первого и второго агентов, могут помочь первым при перестрелке. Если никого не было обнаружено, то первые два агента сообщают остальным о том, что можно двигаться дальше путем подачи команд.</li>
+                            <li><strong>Головной агент</strong> прикрывает своих товарищей со спины. Весь штурм должен также сопровождаться подачей команд на волне рации между агентами MTF-7.</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-angle-double-right"></i> Углы:</h4>
+                        <p>Лидер приближается к углу вместе со своим прикрывающим. Прикрывающий должен обеспечить безопасность им обоим.</p>
+                        <p>Лидер имеет более низкую стойку, оставляя тем самым достаточного пространства для ведения огня от прикрывающего.</p>
+                        <p>Прикрывающий передвигается вплотную к лидеру, непосредственно сзади него.</p>
+                        
+                        <p><strong>Неприятельские цели различаются по степени представляемой угрозы. На это оказывают влияние следующие факторы:</strong></p>
+                        <ul class="doc-list">
+                            <li>близость нахождения,</li>
+                            <li>степень вооруженности,</li>
+                            <li>производимые действия,</li>
+                            <li>местонахождение заложников.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="rosterSection" class="section">
+                    <div class="section-header">
+                        <h1><i class="fas fa-users"></i> Личный Состав</h1>
+                        <p>База данных сотрудников и дисциплинарные взыскания</p>
+                    </div>
+
+                    <div class="card">
+                        <table class="roster-table">
+                            <thead>
+                                <tr>
+                                    <th>Позывной</th>
+                                    <th>Звание</th>
+                                    <th>Отдел</th>
+                                    <th>Статус</th>
+                                    <th>Взыскания</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rosterTableBody">
+                                </tbody>
+                        </table>
+                        
+                        <a href="https://forms.gle/3AwZmt8qkp7jnYVM7" target="_blank" class="recruit-btn" style="font-size:12px; margin-top:30px;">
+                            <i class="fas fa-plus-circle"></i> ВНЕСТИ ТРАНСПОРТ В РЕЕСТР
+                        </a>
+                    </div>
+                </section>
 
             </div>
         </main>
@@ -762,7 +929,6 @@
         let agentsDB = [];
         let fleetDB = [];
         let currentUser = null;
-        let currentTheme = 'dark';
 
         // ГЛОБАЛЬНЫЕ ФУНКЦИИ
         window.toggleLogin = function() {
@@ -782,41 +948,6 @@
             location.reload();
         };
 
-        window.closeMobileMenu = function() {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('mobileOverlay').classList.remove('active');
-        };
-
-        window.openMobileMenu = function() {
-            document.getElementById('sidebar').classList.add('active');
-            document.getElementById('mobileOverlay').classList.add('active');
-        };
-
-        // Управление темой
-        function initTheme() {
-            const savedTheme = localStorage.getItem('mtf-theme');
-            if (savedTheme) {
-                currentTheme = savedTheme;
-                if (currentTheme === 'light') {
-                    document.body.classList.add('light-theme');
-                    document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
-                }
-            }
-        }
-
-        function toggleTheme() {
-            if (currentTheme === 'dark') {
-                currentTheme = 'light';
-                document.body.classList.add('light-theme');
-                document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                currentTheme = 'dark';
-                document.body.classList.remove('light-theme');
-                document.getElementById('themeToggle').innerHTML = '<i class="fas fa-moon"></i>';
-            }
-            localStorage.setItem('mtf-theme', currentTheme);
-        }
-
         // ЗАПУСК
         document.addEventListener('DOMContentLoaded', () => {
             // Блокировка ПКМ
@@ -825,21 +956,6 @@
             // Вход по Enter
             document.getElementById('passInput').addEventListener('keyup', (e) => {
                 if(e.key === "Enter") attemptLogin();
-            });
-
-            // Инициализация темы
-            initTheme();
-
-            // Кнопка переключения темы
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-            // Мобильное меню
-            document.getElementById('mobileMenuBtn').addEventListener('click', openMobileMenu);
-            document.getElementById('mobileOverlay').addEventListener('click', closeMobileMenu);
-
-            // Закрытие мобильного меню при клике на ссылку
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', closeMobileMenu);
             });
 
             loadData();
@@ -893,7 +1009,7 @@
             const container = document.getElementById('fleetContainer');
             container.innerHTML = '';
             if (fleetDB.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-dim)">Нет данных.</div>'; return;
+                container.innerHTML = '<div style="color:#666">Нет данных.</div>'; return;
             }
             fleetDB.forEach(car => {
                 const card = document.createElement('div');
@@ -902,7 +1018,7 @@
                     <div class="car-name"><i class="fas fa-car"></i> ${car.name}</div>
                     <div class="car-details">
                         <span><i class="fas fa-user"></i> ${car.owner}</span>
-                        <span style="color: var(--accent);">${car.speed} km/h</span>
+                        <span class="white-text">${car.speed} km/h</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -933,7 +1049,7 @@
         function buildSecureInterface() {
             // Обновляем статус
             document.getElementById('userDisplay').innerHTML = `
-                <div style="color: var(--accent);">${currentUser.callsign}</div>
+                <div class="white-text">${currentUser.callsign}</div>
                 <div style="font-size:10px; color:var(--success)">${currentUser.rank.toUpperCase()}</div>
             `;
 
@@ -942,7 +1058,7 @@
 
             const nav = document.getElementById('navMenu');
             // Сброс меню
-            let menuHTML = `<button onclick="switchTab('public'); closeMobileMenu();" class="nav-btn active"><i class="fas fa-globe"></i> Общая информация</button>`;
+            let menuHTML = `<button onclick="switchTab('public')" class="nav-btn active"><i class="fas fa-globe"></i> Общая информация</button>`;
 
             const r = currentUser.rank.toLowerCase();
             const isTrainee = r.includes('trainee') || r.includes('cadet') || r.includes('стажер');
@@ -953,25 +1069,25 @@
             if (isTrainee) {
                 // СТАЖЕР: Видит только обучение и устав
                 menuHTML += `<div class="nav-category">ОБУЧЕНИЕ</div>`;
-                menuHTML += `<button onclick="switchTab('traineeSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-user-graduate"></i> Для стажера</button>`;
-                menuHTML += `<button onclick="switchTab('structureSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-sitemap"></i> Структура MTF-7</button>`;
-                menuHTML += `<button onclick="switchTab('charterSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-book"></i> Устав группы</button>`;
-                menuHTML += `<button onclick="switchTab('punishmentSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-gavel"></i> Система наказаний</button>`;
+                menuHTML += `<button onclick="switchTab('traineeSection')" class="nav-btn"><i class="fas fa-user-graduate"></i> Для стажера</button>`;
+                menuHTML += `<button onclick="switchTab('structureSection')" class="nav-btn"><i class="fas fa-sitemap"></i> Структура MTF-7</button>`;
+                menuHTML += `<button onclick="switchTab('charterSection')" class="nav-btn"><i class="fas fa-book"></i> Устав группы</button>`;
+                menuHTML += `<button onclick="switchTab('punishmentSection')" class="nav-btn"><i class="fas fa-gavel"></i> Система наказаний</button>`;
                 
                 // Сразу открываем раздел стажера
                 switchTab('traineeSection');
             } else {
                 // АГЕНТ: Не видит "Раздел Стажера". Видит работу.
                 menuHTML += `<div class="nav-category">РАБОЧАЯ ЗОНА</div>`;
-                menuHTML += `<button onclick="switchTab('structureSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-sitemap"></i> Структура MTF-7</button>`;
-                menuHTML += `<button onclick="switchTab('charterSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-book"></i> Устав группы</button>`;
-                menuHTML += `<button onclick="switchTab('punishmentSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-gavel"></i> Система наказаний</button>`;
+                menuHTML += `<button onclick="switchTab('structureSection')" class="nav-btn"><i class="fas fa-sitemap"></i> Структура MTF-7</button>`;
+                menuHTML += `<button onclick="switchTab('charterSection')" class="nav-btn"><i class="fas fa-book"></i> Устав группы</button>`;
+                menuHTML += `<button onclick="switchTab('punishmentSection')" class="nav-btn"><i class="fas fa-gavel"></i> Система наказаний</button>`;
                 
                 if (currentUser.isCID) {
-                    menuHTML += `<button onclick="switchTab('cidSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-search"></i> Протоколы CID</button>`;
+                    menuHTML += `<button onclick="switchTab('cidSection')" class="nav-btn"><i class="fas fa-search"></i> Протоколы CID</button>`;
                 }
                 if (currentUser.isTRT) {
-                    menuHTML += `<button onclick="switchTab('trtSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-crosshairs"></i> Протоколы TRT</button>`;
+                    menuHTML += `<button onclick="switchTab('trtSection')" class="nav-btn"><i class="fas fa-crosshairs"></i> Протоколы TRT</button>`;
                 }
                 
                 // Сразу открываем Устав или первый доступный раздел
@@ -980,7 +1096,7 @@
 
             if (isCommander) {
                 menuHTML += `<div class="nav-category" style="color:var(--danger)">УПРАВЛЕНИЕ</div>`;
-                menuHTML += `<button onclick="switchTab('rosterSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-users"></i> Личный состав</button>`;
+                menuHTML += `<button onclick="switchTab('rosterSection')" class="nav-btn"><i class="fas fa-users"></i> Личный состав</button>`;
                 renderRoster();
             }
 
@@ -996,7 +1112,7 @@
             tbody.innerHTML = '';
             
             agentsDB.forEach(a => {
-                let statusColor = a.status.toLowerCase().includes('active') ? 'var(--success)' : 'var(--text-dim)';
+                let statusColor = a.status.toLowerCase().includes('active') ? 'var(--success)' : '#666';
                 
                 let depts = [];
                 if(a.isCID) depts.push('CID');
@@ -1007,7 +1123,7 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="color: var(--accent);">${a.callsign}</td>
+                    <td class="white-text">${a.callsign}</td>
                     <td>${a.rank}</td>
                     <td>${depts.join(' / ') || '-'}</td>
                     <td style="color:${statusColor}">${a.status}</td>
@@ -1048,11 +1164,6 @@
                 'rosterSection': 'ЛИЧНЫЙ СОСТАВ'
             };
             document.getElementById('pageTitle').innerText = titles[id] || 'SECURE ACCESS';
-            
-            // Прокрутка вверх на мобильных
-            if (window.innerWidth <= 768) {
-                document.querySelector('.scroll-container').scrollTop = 0;
-            }
         }
     </script>
 </body>
