@@ -1850,7 +1850,7 @@
 
         const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
 
-        const PROXY = 'https://api.allorigins.win/raw?url=';
+        const PROXY = 'https://api.allorigins.win/get?url=';
 
 
 
@@ -1934,7 +1934,8 @@
 
                 const response = await fetch(uniqueUrl);
 
-                const csvText = await response.text();
+                const data = await response.json();
+                const csvText = data.contents;
 
                 const rows = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
 
