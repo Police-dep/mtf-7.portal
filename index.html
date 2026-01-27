@@ -1930,14 +1930,26 @@
 
             try {
 
-                const uniqueUrl = PROXY + encodeURIComponent(CSV_URL + '&t=' + Date.now());
+                // 1. Формируем ссылку (добавляем время, чтобы не было кэша)
+        const uniqueUrl = PROXY + encodeURIComponent(CSV_URL + '&t=' + Date.now());
+        console.log('Попытка загрузки:', uniqueUrl);
 
-                const response = await fetch(uniqueUrl);
+        // 2. Делаем запрос
+        const response = await fetch(uniqueUrl);
+        
+        if (!response.ok) {
+            throw new Error(`Ошибка сети: ${response.status}`);
+        }
 
-                const data = await response.json();
-                const csvText = data.contents;
+        // 3. Получаем ответ как JSON (самый надежный способ для друзей)
+        const data = await response.json();
+        
+        // 4. Достаем текст таблицы из JSON
+        const csvText = data.contents;
 
-                const rows = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
+        if (!csvText) {
+             throw new Error("Таблица пустая или ошибка прокси");
+        }
 
 
 
