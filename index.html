@@ -844,20 +844,8 @@
 
     <script>
         // КОНФИГУРАЦИЯ
-        // Используем правильный URL для Google Sheets
-        const SHEET_ID = '2PACX-1vTA6JsQdPWCevnaNCzSoWnRfHyrMa1sdv2MHmYcmy06QWWIT6THg7dJZknKnKJL3Qp4OXR5xmzirNeo';
-        // Правильный URL для публикации Google Sheets
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv&gid=0`;
-
-        // Несколько прокси на случай, если один не работает
-        const PROXY_SERVICES = [
-            '', // Прямой доступ (без прокси)
-            'https://api.codetabs.com/v1/proxy?quest=',
-            'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url=',
-            'https://thingproxy.freeboard.io/fetch/'
-        ];
-
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTA6JsQdPWCevnaNCzSoWnRfHyrMa1sdv2MHmYcmy06QWWIT6THg7dJZknKnKJL3Qp4OXR5xmzirNeo/pub?output=csv';
+        
         let agentsDB = [];
         let fleetDB = [];
         let currentUser = null;
@@ -945,75 +933,84 @@
                 btn.addEventListener('click', closeMobileMenu);
             });
 
-            // Загружаем данные
-            loadData();
+            // Загружаем данные с использованием CORS прокси
+            loadDataWithCORS();
         });
 
-        // ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE SHEETS
-        async function loadData() {
+        // ЗАГРУЗКА ДАННЫХ С ИСПОЛЬЗОВАНИЕМ CORS ПРОКСИ
+        async function loadDataWithCORS() {
             try {
-                let dataLoaded = false;
-                let lastError = null;
+                // Используем CORS прокси для обхода ограничений
+                const corsProxy = 'https://api.allorigins.win/raw?url=';
+                const url = corsProxy + encodeURIComponent(SHEET_URL + '&_=' + Date.now());
                 
-                // Пробуем разные прокси-сервисы
-                for (const proxy of PROXY_SERVICES) {
-                    try {
-                        const url = proxy + encodeURIComponent(CSV_URL + '&t=' + Date.now());
-                        
-                        console.log('Попытка загрузки через:', proxy || 'Прямой доступ');
-                        
-                        const response = await fetch(url, {
-                            method: 'GET',
-                            mode: 'cors',
-                            headers: {
-                                'Content-Type': 'text/csv'
-                            }
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP error: ${response.status}`);
-                        }
-                        
-                        const csvText = await response.text();
-                        
-                        if (!csvText || csvText.trim() === '') {
-                            throw new Error('Получен пустой ответ');
-                        }
-                        
-                        // Парсим CSV
-                        const rows = Papa.parse(csvText, { 
-                            header: false, 
-                            skipEmptyLines: true,
-                            encoding: 'UTF-8'
-                        }).data;
-                        
-                        console.log('Успешно загружено строк:', rows.length);
-                        
-                        if (rows.length > 0) {
-                            processData(rows);
-                            dataLoaded = true;
-                            break;
-                        }
-                        
-                    } catch (error) {
-                        console.log('Ошибка при загрузке через', proxy || 'прямой доступ:', error.message);
-                        lastError = error;
-                        continue; // Пробуем следующий прокси
-                    }
+                console.log('Загружаем данные с URL:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status}`);
                 }
                 
-                if (!dataLoaded) {
-                    throw lastError || new Error('Не удалось загрузить данные ни через один из прокси');
+                const csvText = await response.text();
+                
+                if (!csvText || csvText.trim() === '') {
+                    throw new Error('Получен пустой ответ');
                 }
+                
+                // Парсим CSV
+                const rows = Papa.parse(csvText, { 
+                    header: false, 
+                    skipEmptyLines: true,
+                    encoding: 'UTF-8'
+                }).data;
+                
+                console.log('Успешно загружено строк:', rows.length);
+                console.log('Первые 3 строки для отладки:', rows.slice(0, 3));
+                
+                processData(rows);
                 
             } catch (error) {
-                console.error('Критическая ошибка загрузки данных:', error);
-                document.getElementById('fleetContainer').innerHTML = 
-                    '<div style="color:var(--danger); padding: 20px; text-align: center;">' +
-                    '<i class="fas fa-exclamation-triangle"></i> Ошибка загрузки данных<br>' +
-                    '<small>Попробуйте обновить страницу или проверьте подключение к интернету</small>' +
-                    '</div>';
+                console.error('Ошибка при загрузке через CORS прокси:', error);
+                
+                // Пробуем альтернативный метод без прокси
+                try {
+                    console.log('Пробуем альтернативный метод...');
+                    await loadDataDirect();
+                } catch (error2) {
+                    console.error('Альтернативный метод также не сработал:', error2);
+                    showError();
+                }
             }
+        }
+
+        // ПРЯМАЯ ЗАГРУЗКА БЕЗ ПРОКСИ
+        async function loadDataDirect() {
+            const url = SHEET_URL + '&_=' + Date.now();
+            console.log('Пробуем прямой доступ к:', url);
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ошибка: ${response.status}`);
+            }
+            
+            const csvText = await response.text();
+            
+            if (!csvText || csvText.trim() === '') {
+                throw new Error('Получен пустой ответ');
+            }
+            
+            // Парсим CSV
+            const rows = Papa.parse(csvText, { 
+                header: false, 
+                skipEmptyLines: true,
+                encoding: 'UTF-8'
+            }).data;
+            
+            console.log('Прямая загрузка успешна, строк:', rows.length);
+            
+            processData(rows);
         }
 
         // ОБРАБОТКА ДАННЫХ
@@ -1021,48 +1018,84 @@
             fleetDB = [];
             agentsDB = [];
             
+            // Проверяем структуру данных - выводим все строки для отладки
+            console.log('Все строки для отладки:');
+            rows.forEach((row, index) => {
+                console.log(`Строка ${index}:`, row);
+            });
+            
             // Пропускаем заголовок (первую строку)
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
                 
                 // Машины (колонки J, K, L -> индексы 9, 10, 11)
-                if (row[9] && row[9].trim() !== '') {
+                // Давайте найдем все колонки, которые могут содержать данные о машинах
+                for (let j = 0; j < row.length; j++) {
+                    if (row[j] && row[j].toString().toLowerCase().includes('car') || 
+                        row[j] && row[j].toString().match(/[a-zA-Z]/) && row[j].toString().length > 3) {
+                        console.log(`Возможная машина в строке ${i}, колонка ${j}:`, row[j]);
+                    }
+                }
+                
+                // Ищем машины по известным индексам
+                if (row[9] && row[9].toString().trim() !== '') {
                     fleetDB.push({
-                        name: row[9].trim(),
-                        owner: row[10] ? row[10].trim() : 'Не указан',
-                        speed: row[11] ? row[11].trim() : '-'
+                        name: row[9].toString().trim(),
+                        owner: row[10] ? row[10].toString().trim() : 'Не указан',
+                        speed: row[11] ? row[11].toString().trim() : '-'
                     });
                 }
                 
                 // Агенты (колонки A-G -> индексы 0-6)
-                if (row[0] && row[0].trim() !== '') {
-                    // Проверяем статусы отделов
+                if (row[0] && row[0].toString().trim() !== '') {
+                    // Преобразуем все значения к строке для надежности
+                    const callsign = row[0].toString().trim();
+                    const code = row[1] ? row[1].toString().trim() : '';
+                    const rank = row[2] ? row[2].toString().trim() : 'Unknown';
+                    const status = row[3] ? row[3].toString().trim() : 'Unknown';
                     const cidStatus = row[4] ? row[4].toString().toLowerCase() : '';
                     const trtStatus = row[5] ? row[5].toString().toLowerCase() : '';
+                    const punishment = row[6] ? row[6].toString().trim() : '';
                     
                     agentsDB.push({
-                        callsign: row[0].trim(),
-                        code: row[1] ? row[1].toString().trim() : '',
-                        rank: row[2] ? row[2].trim() : 'Unknown',
-                        status: row[3] ? row[3].trim() : 'Unknown',
-                        isCID: cidStatus.includes('+') || cidStatus.includes('да') || cidStatus.includes('yes') || cidStatus === 'true',
-                        isTRT: trtStatus.includes('+') || trtStatus.includes('да') || trtStatus.includes('yes') || trtStatus === 'true',
-                        punishment: row[6] ? row[6].trim() : ''
+                        callsign: callsign,
+                        code: code,
+                        rank: rank,
+                        status: status,
+                        isCID: cidStatus.includes('+') || cidStatus.includes('да') || cidStatus.includes('yes') || cidStatus === 'true' || cidStatus === '1',
+                        isTRT: trtStatus.includes('+') || trtStatus.includes('да') || trtStatus.includes('yes') || trtStatus === 'true' || trtStatus === '1',
+                        punishment: punishment
                     });
                 }
             }
             
-            console.log('Загружено агентов:', agentsDB.length);
-            console.log('Загружено машин:', fleetDB.length);
+            console.log('Обработано агентов:', agentsDB.length);
+            console.log('Обработано машин:', fleetDB.length);
+            console.log('Агенты:', agentsDB);
+            console.log('Машины:', fleetDB);
             
             // Рендерим данные
             renderFleet();
             
             // Обновляем сообщение
-            if (fleetDB.length === 0) {
-                document.getElementById('fleetContainer').innerHTML = 
+            updateDataStatus();
+        }
+
+        // ОБНОВЛЕНИЕ СТАТУСА ДАННЫХ
+        function updateDataStatus() {
+            const container = document.getElementById('fleetContainer');
+            
+            if (agentsDB.length === 0 && fleetDB.length === 0) {
+                container.innerHTML = 
+                    '<div style="color:var(--warning); text-align: center; padding: 20px;">' +
+                    '<i class="fas fa-exclamation-triangle"></i> Данные загружены, но не найдены записи<br>' +
+                    '<small>Проверьте структуру Google таблицы</small>' +
+                    '</div>';
+            } else if (fleetDB.length === 0) {
+                container.innerHTML = 
                     '<div style="color:var(--text-dim); text-align: center; padding: 20px;">' +
-                    '<i class="fas fa-info-circle"></i> Нет данных о транспорте в базе' +
+                    '<i class="fas fa-info-circle"></i> Нет данных о транспорте в базе<br>' +
+                    '<small>Агентов загружено: ' + agentsDB.length + '</small>' +
                     '</div>';
             }
         }
@@ -1072,7 +1105,7 @@
             const container = document.getElementById('fleetContainer');
             
             if (fleetDB.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-dim); padding: 20px; text-align: center;">Нет данных о транспорте</div>'; 
+                updateDataStatus();
                 return;
             }
             
@@ -1092,6 +1125,16 @@
             });
         }
 
+        // ПОКАЗ ОШИБКИ
+        function showError() {
+            document.getElementById('fleetContainer').innerHTML = 
+                '<div style="color:var(--danger); padding: 20px; text-align: center;">' +
+                '<i class="fas fa-exclamation-triangle"></i> Не удалось загрузить данные<br>' +
+                '<small>Попробуйте обновить страницу (F5)</small><br>' +
+                '<button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: var(--accent); color: var(--bg-body); border: none; cursor: pointer;">Обновить страницу</button>' +
+                '</div>';
+        }
+
         // ЛОГИН
         function attemptLogin() {
             const u = document.getElementById('userInput').value.trim();
@@ -1108,8 +1151,11 @@
             }
 
             const agent = agentsDB.find(a => {
-                // Сравниваем позывной без учета регистра
-                return a.callsign.toLowerCase() === u.toLowerCase() && a.code === p;
+                // Сравниваем позывной без учета регистра и пробелов
+                const inputCallsign = u.toLowerCase().replace(/\s+/g, '');
+                const dbCallsign = a.callsign.toLowerCase().replace(/\s+/g, '');
+                
+                return dbCallsign === inputCallsign && a.code === p;
             });
 
             if (agent) {
