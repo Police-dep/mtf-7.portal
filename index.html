@@ -360,21 +360,193 @@
         .recruit-btn:hover { opacity: 0.9; }
         
         /* Сетка машин */
+        /* === ПОИСК ПО АВТОПАРКУ === */
+        .fleet-search-wrap {
+            margin-bottom: 20px;
+        }
+        .fleet-search {
+            width: 100%;
+            max-width: 360px;
+            padding: 10px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .fleet-search:focus { border-color: var(--accent); }
+
+        /* === КАРТОЧКИ МАШИН === */
         .fleet-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 20px; 
-            margin-top: 30px; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 16px; 
+            margin-top: 0;
         }
         .car-card { 
             background: var(--bg-panel); 
-            border: 1px solid var(--border); 
-            padding: 25px; 
-            transition: transform 0.3s ease;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
         }
-        .car-card:hover { transform: translateY(-3px); }
-        .car-name { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .car-details { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); }
+        .car-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); border-color: var(--text-muted); }
+        .car-photo {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+            background: var(--bg-input);
+        }
+        .car-photo-placeholder {
+            width: 100%;
+            height: 160px;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 32px;
+        }
+        .car-info { padding: 16px; }
+        .car-name { font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .car-details { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); }
+
+        /* === МОДАЛ МАШИНЫ === */
+        .car-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .car-modal-overlay.open { display: flex; }
+        .car-modal {
+            width: 480px;
+            max-width: 92%;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--accent);
+            box-shadow: 0 0 60px var(--shadow);
+            animation: fadeIn 0.2s ease;
+        }
+        .car-modal-header {
+            padding: 24px 28px 16px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .car-modal-title { font-size: 24px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
+        .car-modal-subtitle { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+        .car-modal-close {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 18px; cursor: pointer; padding: 0; transition: 0.2s; flex-shrink: 0;
+        }
+        .car-modal-close:hover { color: var(--accent); }
+        .car-modal-body { padding: 6px 28px 24px 28px; }
+        .car-modal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 0;
+            border-bottom: 1px dashed var(--border);
+            font-size: 13px;
+            gap: 20px;
+        }
+        .car-modal-row:last-child { border-bottom: none; }
+        .car-modal-row .row-label { color: var(--text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; flex-shrink: 0; }
+        .car-modal-row .row-value { color: var(--text-main); font-weight: 700; text-align: right; word-break: break-all; }
+        .car-modal-row .row-value a { color: var(--accent); text-decoration: underline; font-size: 12px; word-break: break-all; }
+
+        /* Мигание найденного элемента */
+        @keyframes search-flash {
+            0%   { outline: 2px solid transparent; background: transparent; }
+            15%  { outline: 2px solid var(--accent); background: rgba(128,128,128,0.15); }
+            45%  { outline: 2px solid var(--accent); background: rgba(128,128,128,0.08); }
+            70%  { outline: 2px solid var(--accent); background: rgba(128,128,128,0.15); }
+            100% { outline: 2px solid transparent; background: transparent; }
+        }
+        .search-flash {
+            animation: search-flash 1.8s ease;
+            border-radius: 2px;
+        }
+        .search-wrap {
+            position: relative;
+            display: none;
+            align-items: center;
+        }
+        .search-wrap.visible { display: flex; }
+        .search-input {
+            width: 220px;
+            padding: 8px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s, width 0.3s;
+        }
+        .search-input:focus { border-color: var(--accent); width: 280px; }
+        .search-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            width: 360px;
+            max-height: 420px;
+            overflow-y: auto;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 30px var(--shadow);
+            z-index: 3000;
+            display: none;
+        }
+        .search-dropdown.open { display: block; }
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: var(--bg-hover); }
+        .search-result-section {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .search-result-text {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+        .search-result-text mark {
+            background: transparent;
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .search-result-count {
+            padding: 10px 16px;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            border-top: 1px solid var(--border);
+            background: var(--bg-input);
+        }
+        .search-no-results {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
 
         /* Стили для вложенных списков */
         .doc-list ul { list-style: none; margin-left: 20px; margin-top: 10px; }
@@ -927,6 +1099,20 @@
         </div>
     </div>
 
+    <!-- Модал машины -->
+    <div class="car-modal-overlay" id="carModal" onclick="closeCarModal(event)">
+        <div class="car-modal">
+            <div class="car-modal-header">
+                <div>
+                    <div class="car-modal-title" id="carModalTitle"></div>
+                    <div class="car-modal-subtitle">Информация о транспорте</div>
+                </div>
+                <button class="car-modal-close" onclick="document.getElementById('carModal').classList.remove('open')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="car-modal-body" id="carModalBody"></div>
+        </div>
+    </div>
+
     <div id="loginOverlay" class="login-overlay hidden">
         <div class="login-box">
             <i class="fas fa-times close-login" onclick="toggleLogin()"></i>
@@ -978,6 +1164,10 @@
             <div class="top-bar">
                 <div class="page-title" id="pageTitle">ОБЩАЯ ИНФОРМАЦИЯ</div>
                 <div class="top-controls">
+                    <div class="search-wrap" id="searchWrap">
+                        <input type="text" class="search-input" id="globalSearch" placeholder="Поиск по разделам..." oninput="onSearchInput()" onblur="onSearchBlur()" autocomplete="off">
+                        <div class="search-dropdown" id="searchDropdown"></div>
+                    </div>
                     <button id="reloadBtn" class="reload-btn" title="Обновить данные" onclick="softReload()">
                         <i class="fas fa-sync-alt"></i>
                     </button>
@@ -1043,6 +1233,9 @@
                         </a>
                     </div>
                     
+                    <div class="fleet-search-wrap">
+                        <input type="text" class="fleet-search" id="fleetSearch" placeholder="Поиск по названию или владельцу..." oninput="filterFleet()">
+                    </div>
                     <div id="fleetContainer" class="fleet-grid">
                         <div style="color: var(--text-dim); text-align: center; padding: 20px;">
                             <i class="fas fa-spinner fa-spin"></i> Загрузка данных...
@@ -2110,9 +2303,10 @@
                 // Ищем машины по известным индексам
                 if (row[9] && row[9].toString().trim() !== '') {
                     fleetDB.push({
-                        name: row[9].toString().trim(),
+                        name:  row[9].toString().trim(),
                         owner: row[10] ? row[10].toString().trim() : 'Не указан',
-                        speed: row[11] ? row[11].toString().trim() : '-'
+                        speed: row[11] ? row[11].toString().trim() : '—',
+                        photo: row[12] ? row[12].toString().trim() : ''
                     });
                 }
                 
@@ -2200,29 +2394,66 @@
         }
 
         // ОТРИСОВКА МАШИН
-        function renderFleet() {
+        function renderFleet(data) {
             const container = document.getElementById('fleetContainer');
-            
-            if (fleetDB.length === 0) {
-                updateDataStatus();
+            const list = data || fleetDB;
+
+            if (list.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:30px;grid-column:1/-1"><i class="fas fa-car" style="font-size:24px;margin-bottom:10px;display:block"></i>Нет данных о транспорте</div>';
                 return;
             }
-            
+
             container.innerHTML = '';
-            
-            fleetDB.forEach(car => {
+            list.forEach(car => {
                 const card = document.createElement('div');
                 card.className = 'car-card';
+                const photoHTML = car.photo
+                    ? `<img class="car-photo" src="${car.photo}" alt="${car.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                      + `<div class="car-photo-placeholder" style="display:none"><i class="fas fa-car"></i></div>`
+                    : `<div class="car-photo-placeholder"><i class="fas fa-car"></i></div>`;
                 card.innerHTML = `
-                    <div class="car-name"><i class="fas fa-car"></i> ${car.name}</div>
-                    <div class="car-details">
-                        <span><i class="fas fa-user"></i> ${car.owner}</span>
-                        <span style="color: var(--accent);">${car.speed}</span>
+                    ${photoHTML}
+                    <div class="car-info">
+                        <div class="car-name"><i class="fas fa-car"></i> ${car.name}</div>
+                        <div class="car-details">
+                            <span><i class="fas fa-user"></i> ${car.owner}</span>
+                            <span style="color:var(--accent)">${car.speed}</span>
+                        </div>
                     </div>
                 `;
+                card.addEventListener('click', () => openCarModal(car));
                 container.appendChild(card);
             });
         }
+
+        window.filterFleet = function() {
+            const q = (document.getElementById('fleetSearch')?.value || '').toLowerCase().trim();
+            if (!q) { renderFleet(fleetDB); return; }
+            const filtered = fleetDB.filter(c =>
+                c.name.toLowerCase().includes(q) || c.owner.toLowerCase().includes(q)
+            );
+            renderFleet(filtered);
+        };
+
+        window.openCarModal = function(car) {
+            document.getElementById('carModalTitle').textContent = car.name;
+            const photoRow = car.photo
+                ? `<div class="car-modal-row"><span class="row-label">Фото машины</span><span class="row-value"><a href="${car.photo}" target="_blank">${car.photo}</a></span></div>`
+                : '';
+            document.getElementById('carModalBody').innerHTML = `
+                <div class="car-modal-row"><span class="row-label">Владелец транспорта</span><span class="row-value">${car.owner}</span></div>
+                <div class="car-modal-row"><span class="row-label">Скорость транспорта</span><span class="row-value">${car.speed || '—'}</span></div>
+                <div class="car-modal-row"><span class="row-label">Марка машины</span><span class="row-value">${car.name}</span></div>
+                ${photoRow}
+            `;
+            document.getElementById('carModal').classList.add('open');
+        };
+
+        window.closeCarModal = function(e) {
+            if (e.target === document.getElementById('carModal')) {
+                document.getElementById('carModal').classList.remove('open');
+            }
+        };
 
         // ПОКАЗ ОШИБКИ
         function showError() {
@@ -2297,6 +2528,9 @@
 
             // ЗАПУСТИТЬ ПУЛЬС ПРИСУТСТВИЯ
             startHeartbeat();
+
+            // ПОКАЗАТЬ ПОИСК + ПОСТРОИТЬ ИНДЕКС
+            setTimeout(() => updateSearchVisibility(), 200);
 
             const nav = document.getElementById('navMenu');
             // Сброс меню
@@ -2421,28 +2655,29 @@
             }
         };
 
-        // === ЗАЩИТА ОТ СКРИНШОТОВ v3 ===
-        // Логика: щит активен только когда currentSection !== 'public' И пользователь залогинен
-        // ПК: блокируем по клавишам + blur
-        // Мобайл: visibilitychange (смена вкладки / переход в другое приложение)
+        // === ЗАЩИТА ОТ СКРИНШОТОВ — ТОЛЬКО ДЛЯ КОМАНДИРОВ ===
         (function() {
             const shield = document.getElementById('screenshotShield');
             if (!shield) return;
 
             const heldKeys = new Set();
             let hideTimer = null;
-            let shieldPCTimer = null; // для авто-скрытия после ПКМ
+            let shieldPCTimer = null;
 
-            function isProtectedPage() {
-                // Защита только если залогинен и не на публичной странице
-                return currentUser !== null && currentSection !== 'public';
+            function isCommander() {
+                if (!currentUser) return false;
+                const r = currentUser.rank.toLowerCase();
+                return r.includes('commander') || r.includes('sub') || r.includes('c.mtf') || r.includes('sub.mtf');
+            }
+
+            function isProtected() {
+                return isCommander() && currentSection !== 'public';
             }
 
             function showShield() {
-                if (!isProtectedPage()) return;
+                if (!isProtected()) return;
                 shield.style.display = 'block';
                 clearTimeout(hideTimer);
-                // Затираем буфер обмена дважды
                 setTimeout(() => { try { navigator.clipboard.writeText('').catch(()=>{}); } catch(e){} }, 60);
                 setTimeout(() => { try { navigator.clipboard.writeText('').catch(()=>{}); } catch(e){} }, 600);
             }
@@ -2452,38 +2687,29 @@
                 hideTimer = setTimeout(() => { shield.style.display = 'none'; }, delay || 0);
             }
 
-            // === ПК: перехват клавиш ===
             function isDangerous() {
                 if (heldKeys.has('PrintScreen')) return true;
                 if (heldKeys.has('Meta') && heldKeys.has('Shift')) return true;
-                if (heldKeys.has('Alt')) return true;
+                // Alt только в связке с PrintScreen, не сам по себе (Alt+Shift = смена языка)
+                if (heldKeys.has('Alt') && heldKeys.has('PrintScreen')) return true;
                 return false;
             }
 
             document.addEventListener('keydown', function(e) {
                 heldKeys.add(e.key);
-                if (isDangerous()) {
-                    showShield();
-                    e.preventDefault();
-                }
+                if (isDangerous()) { showShield(); e.preventDefault(); }
             }, true);
 
             document.addEventListener('keyup', function(e) {
                 heldKeys.delete(e.key);
-                if (!isDangerous()) {
-                    hideShield(1200);
-                }
+                if (!isDangerous()) hideShield(1200);
             }, true);
 
-            // ПКМ убирает щит через ~200мс (чтобы не мешало работе с сайтом)
             document.addEventListener('mousedown', function(e) {
                 if (e.button === 2 && shield.style.display === 'block') {
                     clearTimeout(hideTimer);
                     clearTimeout(shieldPCTimer);
-                    shieldPCTimer = setTimeout(() => {
-                        heldKeys.clear();
-                        shield.style.display = 'none';
-                    }, 200);
+                    shieldPCTimer = setTimeout(() => { heldKeys.clear(); shield.style.display = 'none'; }, 200);
                 }
             });
 
@@ -2531,6 +2757,9 @@
             };
             document.getElementById('pageTitle').innerText = titles[id] || 'SECURE ACCESS';
             
+            // Обновить видимость поиска
+            updateSearchVisibility();
+
             // Прокрутка вверх на мобильных
             if (window.innerWidth <= 768) {
                 document.querySelector('.scroll-container').scrollTop = 0;
@@ -2638,6 +2867,195 @@
             }, { passive: true });
             document.addEventListener('touchend', () => { isDragging = false; });
         })();
+
+        // ══════════════════════════════════════════════════
+        //  ГЛОБАЛЬНЫЙ ПОИСК ПО РАЗДЕЛАМ
+        //  Индекс строится из DOM по доступным секциям пользователя
+        //  Результаты — только из разделов к которым есть доступ
+        //  Лимит: первые 8 результатов, остальные — счётчик
+        // ══════════════════════════════════════════════════
+
+        const SEARCH_LIMIT = 8; // максимум результатов в дропдауне
+        let searchIndex = [];   // [{section, sectionLabel, text, el}]
+        let searchTimer = null;
+
+        // Названия секций
+        const SECTION_LABELS = {
+            'structureSection':   'Структура MTF-7',
+            'charterSection':     'Устав группы',
+            'punishmentSection':  'Система наказаний',
+            'traineeSection':     'Для стажера',
+            'cidSection':         'Протоколы CID',
+            'trtSection':         'Протоколы TRT',
+            'rosterSection':      'Личный состав',
+        };
+
+        // Какие секции доступны для данной роли
+        function getAccessibleSections() {
+            if (!currentUser) return [];
+            const r = currentUser.rank.toLowerCase();
+            const isTrainee  = r.includes('trainee') || r.includes('cadet') || r.includes('стажер') || r.includes('tr.mtf');
+            const isCommander = r.includes('commander') || r.includes('deputy') || r.includes('sub') || r.includes('c.mtf') || r.includes('sub.mtf');
+            const isSenior   = r.includes('senior') || r.includes('s.mtf');
+
+            const base = ['structureSection', 'charterSection', 'punishmentSection'];
+            if (isTrainee) return ['traineeSection', ...base];
+
+            const sections = [...base];
+            if (currentUser.isCID) sections.push('cidSection');
+            if (currentUser.isTRT) sections.push('trtSection');
+            if (isCommander || isSenior) sections.push('rosterSection');
+            return sections;
+        }
+
+        // Строим индекс из текстового содержимого секций
+        function buildSearchIndex() {
+            searchIndex = [];
+            const accessible = getAccessibleSections();
+            accessible.forEach(sectionId => {
+                const el = document.getElementById(sectionId);
+                if (!el) return;
+                const label = SECTION_LABELS[sectionId] || sectionId;
+
+                const nodes = el.querySelectorAll('p, li, h3, h4, td');
+                nodes.forEach(node => {
+                    const text = node.textContent.trim().replace(/\s+/g, ' ');
+                    if (text.length < 12) return;
+                    // Храним ссылку на реальный DOM-узел для скролла
+                    searchIndex.push({ section: sectionId, sectionLabel: label, text, node });
+                });
+            });
+        }
+
+        // Подсвечиваем совпадение в тексте
+        function highlight(text, query) {
+            const idx = text.toLowerCase().indexOf(query.toLowerCase());
+            if (idx === -1) return escHtml(text.substring(0, 120));
+            const start = Math.max(0, idx - 40);
+            const end = Math.min(text.length, idx + query.length + 80);
+            const before = (start > 0 ? '...' : '') + escHtml(text.substring(start, idx));
+            const match  = `<mark>${escHtml(text.substring(idx, idx + query.length))}</mark>`;
+            const after  = escHtml(text.substring(idx + query.length, end)) + (end < text.length ? '...' : '');
+            return before + match + after;
+        }
+
+        function escHtml(s) {
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        // Поиск
+        function doSearch(query) {
+            if (!query || query.length < 2) return [];
+            const q = query.toLowerCase();
+            const results = [];
+            const seen = new Set(); // дедупликация одинаковых текстов
+
+            for (const entry of searchIndex) {
+                if (!entry.text.toLowerCase().includes(q)) continue;
+                const key = entry.section + '::' + entry.text.substring(0, 60);
+                if (seen.has(key)) continue;
+                seen.add(key);
+                results.push(entry);
+            }
+            return results;
+        }
+
+        function renderSearchResults(results, query) {
+            const dd = document.getElementById('searchDropdown');
+            if (!dd) return;
+
+            if (results.length === 0) {
+                dd.innerHTML = `<div class="search-no-results"><i class="fas fa-search"></i><br>Ничего не найдено</div>`;
+                dd.classList.add('open');
+                return;
+            }
+
+            const shown = results.slice(0, SEARCH_LIMIT);
+            const extra = results.length - shown.length;
+
+            let html = shown.map((r, i) => `
+                <div class="search-result-item" onmousedown="goToResult(${searchIndex.indexOf(r)})">
+                    <div class="search-result-section">${r.sectionLabel}</div>
+                    <div class="search-result-text">${highlight(r.text, query)}</div>
+                </div>
+            `).join('');
+
+            if (extra > 0) {
+                html += `<div class="search-result-count">Ещё ${extra} результатов — уточните запрос</div>`;
+            }
+
+            dd.innerHTML = html;
+            dd.classList.add('open');
+        }
+
+        window.goToResult = function(idx) {
+            const result = searchIndex[idx];
+            if (!result) return;
+
+            document.getElementById('globalSearch').value = '';
+            document.getElementById('searchDropdown').classList.remove('open');
+
+            switchTab(result.section);
+
+            // Небольшая задержка чтобы секция успела стать видимой
+            setTimeout(() => {
+                const node = result.node;
+                if (!node) return;
+
+                // Скролл точно к элементу
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Убираем предыдущую анимацию если была
+                node.classList.remove('search-flash');
+                // Форс-рефлоу чтобы анимация перезапустилась
+                void node.offsetWidth;
+                node.classList.add('search-flash');
+
+                // Убираем класс после анимации
+                setTimeout(() => node.classList.remove('search-flash'), 1900);
+            }, 120);
+        };
+
+        // Оставляем для обратной совместимости
+        window.goToSection = function(sectionId) {
+            switchTab(sectionId);
+            document.getElementById('globalSearch').value = '';
+            document.getElementById('searchDropdown').classList.remove('open');
+        };
+
+        window.onSearchInput = function() {
+            clearTimeout(searchTimer);
+            const q = document.getElementById('globalSearch').value.trim();
+            if (!q || q.length < 2) {
+                document.getElementById('searchDropdown').classList.remove('open');
+                return;
+            }
+            // Небольшая задержка чтобы не искать при каждом символе
+            searchTimer = setTimeout(() => {
+                const results = doSearch(q);
+                renderSearchResults(results, q);
+            }, 180);
+        };
+
+        window.onSearchBlur = function() {
+            // Небольшая задержка чтобы клик по результату успел сработать
+            setTimeout(() => {
+                document.getElementById('searchDropdown')?.classList.remove('open');
+            }, 200);
+        };
+
+        // Показываем/скрываем строку поиска в зависимости от страницы
+        function updateSearchVisibility() {
+            const wrap = document.getElementById('searchWrap');
+            if (!wrap) return;
+            if (currentUser && currentSection !== 'public') {
+                wrap.classList.add('visible');
+                buildSearchIndex();
+            } else {
+                wrap.classList.remove('visible');
+                document.getElementById('searchDropdown')?.classList.remove('open');
+            }
+        }
 
     </script>
 <!--
