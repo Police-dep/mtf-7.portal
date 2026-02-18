@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
         /* === ПЕРЕМЕННЫЕ ДЛЯ ТЕМ === */
@@ -221,69 +224,6 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            position: relative;
-        }
-
-        /* Поиск по тексту */
-        .search-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        #globalSearch {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px 15px;
-            font-family: inherit;
-            font-size: 13px;
-            width: 220px;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        #globalSearch:focus {
-            border-color: var(--accent);
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 2000;
-            margin-top: 5px;
-        }
-
-        .search-results.hidden {
-            display: none;
-        }
-
-        .search-result-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .search-result-item:hover {
-            background: var(--bg-hover);
-        }
-
-        .search-result-item .result-title {
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 13px;
-        }
-
-        .search-result-item .result-sub {
-            color: var(--text-dim);
-            font-size: 11px;
-            margin-top: 3px;
         }
 
         .theme-toggle {
@@ -431,7 +371,6 @@
             border: 1px solid var(--border); 
             padding: 25px; 
             transition: transform 0.3s ease;
-            cursor: pointer;
         }
         .car-card:hover { transform: translateY(-3px); }
         .car-name { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
@@ -635,6 +574,44 @@
         .roster-td-status.s-leave    { color: var(--warning) !important; }
         .roster-td-punish   { font-size: 11px; font-weight: 700; color: var(--danger) !important; }
 
+        /* Онлайн-индикатор */
+        .online-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 5px var(--success);
+            margin-right: 8px;
+            flex-shrink: 0;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,100% { opacity: 1; }
+            50%      { opacity: 0.4; }
+        }
+        .offline-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--border);
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Счётчик онлайн в шапке состава */
+        .online-counter {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .online-counter .cnt {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
         /* === МОДАЛ АГЕНТА === */
         .agent-modal-overlay {
             display: none;
@@ -683,13 +660,6 @@
         .agent-modal-row .row-label { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
         .agent-modal-row .row-value { color: var(--text-main); font-weight: 700; text-align: right; }
 
-        /* Подсветка поиска */
-        .highlight {
-            background-color: var(--warning);
-            color: #000;
-            font-weight: bold;
-        }
-
         /* === МЕДИА-ЗАПРОСЫ ДЛЯ АДАПТИВНОСТИ === */
         
         /* Планшеты и маленькие ноутбуки */
@@ -728,10 +698,6 @@
             
             .top-bar {
                 padding: 0 30px;
-            }
-
-            #globalSearch {
-                width: 180px;
             }
         }
 
@@ -786,16 +752,6 @@
             
             .top-controls {
                 gap: 10px;
-            }
-
-            .search-wrapper {
-                order: 1;
-            }
-
-            #globalSearch {
-                width: 140px;
-                padding: 6px 10px;
-                font-size: 12px;
             }
             
             .auth-btn {
@@ -880,10 +836,6 @@
             .page-title {
                 left: 70px;
                 max-width: 120px;
-            }
-
-            #globalSearch {
-                width: 110px;
             }
             
             .scroll-container {
@@ -975,37 +927,6 @@
         </div>
     </div>
 
-    <!-- Модал машины -->
-    <div class="agent-modal-overlay" id="carModal" onclick="closeCarModal(event)">
-        <div class="agent-modal">
-            <div class="agent-modal-header">
-                <div>
-                    <div class="agent-modal-name" id="modalCarName"></div>
-                    <div class="agent-modal-rank" id="modalCarOwner"></div>
-                </div>
-                <button class="agent-modal-close" onclick="document.getElementById('carModal').classList.remove('open')"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="agent-modal-body" id="modalCarBody">
-                <div class="agent-modal-row">
-                    <span class="row-label">Владелец транспорта</span>
-                    <span class="row-value" id="modalCarOwnerValue"></span>
-                </div>
-                <div class="agent-modal-row">
-                    <span class="row-label">Скорость транспорта</span>
-                    <span class="row-value" id="modalCarSpeed"></span>
-                </div>
-                <div class="agent-modal-row">
-                    <span class="row-label">Марка машины</span>
-                    <span class="row-value" id="modalCarModel"></span>
-                </div>
-                <div class="agent-modal-row">
-                    <span class="row-label">Фото машины</span>
-                    <span class="row-value" id="modalCarPhoto"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="loginOverlay" class="login-overlay hidden">
         <div class="login-box">
             <i class="fas fa-times close-login" onclick="toggleLogin()"></i>
@@ -1046,7 +967,7 @@
                     <button onclick="switchTab('public'); closeMobileMenu();" class="nav-btn active">
                         <i class="fas fa-globe"></i> Общая информация
                     </button>
-                </div>
+                    </div>
             </div>
             <div class="user-status" id="userDisplay">
                 <i class="fas fa-user-shield"></i> &nbsp;ГОСТЕВОЙ РЕЖИМ
@@ -1057,11 +978,6 @@
             <div class="top-bar">
                 <div class="page-title" id="pageTitle">ОБЩАЯ ИНФОРМАЦИЯ</div>
                 <div class="top-controls">
-                    <!-- Поиск по тексту (виден только авторизованным) -->
-                    <div class="search-wrapper hidden" id="searchWrapper">
-                        <input type="text" id="globalSearch" placeholder="Поиск по документам..." autocomplete="off">
-                        <div id="searchResults" class="search-results hidden"></div>
-                    </div>
                     <button id="reloadBtn" class="reload-btn" title="Обновить данные" onclick="softReload()">
                         <i class="fas fa-sync-alt"></i>
                     </button>
@@ -1076,7 +992,6 @@
 
             <div class="scroll-container">
 
-                <!-- Публичная секция -->
                 <section id="public" class="section active">
                     <div class="section-header">
                         <div>
@@ -1135,7 +1050,7 @@
                     </div>
                 </section>
 
-                <!-- Раздел для стажера -->
+                <!-- Дополнительные секции -->
                 <section id="traineeSection" class="section">
                     <div class="section-header">
                         <h1><i class="fas fa-user-graduate"></i> Для стажера</h1>
@@ -1157,7 +1072,6 @@
                     </div>
                 </section>
 
-                <!-- Раздел структуры -->
                 <section id="structureSection" class="section">
                     <div class="section-header">
                         <h1><i class="fas fa-sitemap"></i> Структура MTF-7</h1>
@@ -1187,12 +1101,36 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Commander</td><td>C.MTF-7</td><td>Высшее должностное лицо MTF-7, определяющее стратегию развития и утверждающее внутренние протоколы. Несет персональную ответственность за сохранение режима секретности и автономность подразделения. Единолично принимает решения о санкционировании спецопераций высшего риска и проведении кадровых чисток.</td></tr>
-                                <tr><td>Sub. Commander</td><td>SUB.MTF-7</td><td>Второе лицо в иерархии, осуществляющее оперативное управление личным составом и контроль дисциплины. Курирует работу подразделений, отвечает за проверку отчетности и квалификацию сотрудников. Обладает всей полнотой власти и правом принятия решений в отсутствие командира.</td></tr>
-                                <tr><td>Senior Agent</td><td>S.MTF-7</td><td>Элитный оперативник, выполняющий функции полевого командира во время штурмов и рейдов. Руководит тактическими группами, координирует действия на местах. Отвечает за обучение младшего состава. Выдает наказания агентам.</td></tr>
-                                <tr><td>Agent</td><td>AG.MTF-7</td><td>Основная боевая единица с полным допуском к информации и тайнам. В зависимости от специализации выполняет задачи по штурму укреплений или скрытому наблюдению. Обязан в совершенстве знать все внутренние уставы, протокола, инструкции реагирования и прочую информацию, связанную с группой.</td></tr>
-                                <tr><td>Junior Agent</td><td>J.MTF-7</td><td>Сотрудник, успешно прошедший Академию и получивший личный позывной, но находящийся на испытательном сроке. В этот период определяет свою специализацию для дальнейшей службы. Допускается к участию в операциях под надзором старших офицеров, выполняя задачи огневой поддержки.</td></tr>
-                                <tr><td>Trainee</td><td>TR.MTF-7</td><td>Кандидат, проходящий отбор в ряды MTF без доступа к секретным архивам и федеральной базе данных. Основная задача — изучение базовых деталей и подготовка к экзаменам. Запрещено участвовать в боевых операциях.</td></tr>
+                                <tr>
+                                    <td>Commander</td>
+                                    <td>C.MTF-7</td>
+                                    <td>Высшее должностное лицо MTF-7, определяющее стратегию развития и утверждающее внутренние протоколы. Несет персональную ответственность за сохранение режима секретности и автономность подразделения. Единолично принимает решения о санкционировании спецопераций высшего риска и проведении кадровых чисток.</td>
+                                </tr>
+                                <tr>
+                                    <td>Sub. Commander</td>
+                                    <td>SUB.MTF-7</td>
+                                    <td>Второе лицо в иерархии, осуществляющее оперативное управление личным составом и контроль дисциплины. Курирует работу подразделений, отвечает за проверку отчетности и квалификацию сотрудников. Обладает всей полнотой власти и правом принятия решений в отсутствие командира.</td>
+                                </tr>
+                                <tr>
+                                    <td>Senior Agent</td>
+                                    <td>S.MTF-7</td>
+                                    <td>Элитный оперативник, выполняющий функции полевого командира во время штурмов и рейдов. Руководит тактическими группами, координирует действия на местах. Отвечает за обучение младшего состава. Выдает наказания агентам.</td>
+                                </tr>
+                                <tr>
+                                    <td>Agent</td>
+                                    <td>AG.MTF-7</td>
+                                    <td>Основная боевая единица с полным допуском к информации и тайнам. В зависимости от специализации выполняет задачи по штурму укреплений или скрытому наблюдению. Обязан в совершенстве знать все внутренние уставы, протокола, инструкции реагирования и прочую информацию, связанную с группой.</td>
+                                </tr>
+                                <tr>
+                                    <td>Junior Agent</td>
+                                    <td>J.MTF-7</td>
+                                    <td>Сотрудник, успешно прошедший Академию и получивший личный позывной, но находящийся на испытательном сроке. В этот период определяет свою специализацию для дальнейшей службы. Допускается к участию в операциях под надзором старших офицеров, выполняя задачи огневой поддержки.</td>
+                                </tr>
+                                <tr>
+                                    <td>Trainee</td>
+                                    <td>TR.MTF-7</td>
+                                    <td>Кандидат, проходящий отбор в ряды MTF без доступа к секретным архивам и федеральной базе данных. Основная задача — изучение базовых деталей и подготовка к экзаменам. Запрещено участвовать в боевых операциях.</td>
+                                </tr>
                             </tbody>
                         </table>
                         
@@ -1208,7 +1146,6 @@
                     </div>
                 </section>
 
-                <!-- Раздел устава -->
                 <section id="charterSection" class="section">
                     <div class="section-header">
                         <h1><i class="fas fa-book"></i> Внутренний устав группы</h1>
@@ -1281,7 +1218,6 @@
                     </div>
                 </section>
 
-                <!-- Раздел наказаний -->
                 <section id="punishmentSection" class="section">
                     <div class="section-header">
                         <h1><i class="fas fa-gavel"></i> Система наказаний для агентов</h1>
@@ -1307,7 +1243,6 @@
                     </div>
                 </section>
 
-                <!-- Раздел CID (полностью) -->
                 <section id="cidSection" class="section">
                     <div class="section-header">
                         <h1><i class="fas fa-search"></i> Протоколы CID</h1>
@@ -1585,7 +1520,6 @@
                     </div>
                 </section>
 
-                <!-- Раздел TRT (полностью, включая дополнения) -->
                 <section id="trtSection" class="section">
                     <div class="section-header">
                         <h1><i class="fas fa-crosshairs"></i> Протоколы TRT</h1>
@@ -1680,7 +1614,6 @@
                             </ul>
                         </div>
 
-                        <!-- Дополнительные протоколы -->
                         <div class="protocol-item">
                             <h4><i class="fas fa-shield-alt"></i> 7. Иерархия безопасности и приоритеты</h4>
                             <p>Каждый агент мобильной опергруппы при принятии тактических решений обязан руководствоваться строгой иерархией сохранения жизни. Это не рекомендация — это обязательный оперативный стандарт. Нарушение иерархии в поле приравнивается к провалу операции и влечет служебное расследование.</p>
@@ -1804,18 +1737,22 @@
                     </div>
                 </section>
 
-                <!-- Раздел личного состава -->
                 <section id="rosterSection" class="section">
                     <div class="section-header">
                         <div>
                             <h1><i class="fas fa-users"></i> Личный состав</h1>
                             <p>База данных сотрудников и дисциплинарные взыскания</p>
                         </div>
+                        <div class="online-counter">
+                            <span class="online-dot"></span>
+                            <span>Онлайн: <span class="cnt" id="onlineCount">—</span></span>
+                        </div>
                     </div>
                     <div class="card" style="padding: 0; overflow: hidden;">
                         <table class="roster-table">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Позывной</th>
                                     <th>Звание</th>
                                     <th>Отдел</th>
@@ -1836,6 +1773,103 @@
 
     <script>
         // КОНФИГУРАЦИЯ
+
+        // ══════════════════════════════════════════════════
+        //  FIREBASE — вставь свои данные сюда
+        //  Инструкция: смотри комментарий в конце файла
+        // ══════════════════════════════════════════════════
+        const FIREBASE_CONFIG = {
+            apiKey:            "AIzaSyAtzU9lcxC0-0jTSUSrsSAA_OMJJil9b40",
+            authDomain:        "mobiletaskforce-4158a.firebaseapp.com",
+            databaseURL:       "https://mobiletaskforce-4158a-default-rtdb.firebaseio.com",
+            projectId:         "mobiletaskforce-4158a",
+            storageBucket:     "mobiletaskforce-4158a.firebasestorage.app",
+            messagingSenderId: "329368125856",
+            appId:             "1:329368125856:web:cafff6547a1ac8e47124c5"
+        };
+
+        // Инициализация Firebase (безопасно — не падает если конфиг не заполнен)
+        let firebaseDB = null;
+        let presenceRef = null;
+        let heartbeatTimer = null;
+        let onlineUsers = {}; // { callsign: { rank, ts } }
+        const PRESENCE_TIMEOUT = 60; // секунд — считаем офлайн если нет пульса
+
+        function initFirebase() {
+            try {
+                if (FIREBASE_CONFIG.apiKey === 'ВСТАВЬ_apiKey') return; // не настроен
+                if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+                firebaseDB = firebase.database();
+                console.log('Firebase подключён');
+                listenPresence();
+            } catch(e) {
+                console.warn('Firebase недоступен:', e.message);
+            }
+        }
+
+        // Написать себя в Firebase (при входе + каждые 30 сек)
+        function presenceHeartbeat() {
+            if (!firebaseDB || !currentUser) return;
+            const key = currentUser.callsign.replace(/[.#$\[\]]/g, '_');
+            presenceRef = firebaseDB.ref('presence/' + key);
+            presenceRef.set({
+                callsign: currentUser.callsign,
+                rank:     currentUser.rank,
+                ts:       Math.floor(Date.now() / 1000)
+            });
+            // Удалить запись при закрытии вкладки (onDisconnect)
+            presenceRef.onDisconnect().remove();
+        }
+
+        function startHeartbeat() {
+            if (!firebaseDB) return;
+            presenceHeartbeat();
+            clearInterval(heartbeatTimer);
+            heartbeatTimer = setInterval(presenceHeartbeat, 30000);
+        }
+
+        function stopHeartbeat() {
+            clearInterval(heartbeatTimer);
+            if (presenceRef) {
+                presenceRef.onDisconnect().cancel();
+                presenceRef.remove();
+                presenceRef = null;
+            }
+        }
+
+        // Слушаем всех онлайн-пользователей в реальном времени
+        function listenPresence() {
+            if (!firebaseDB) return;
+            const ref = firebaseDB.ref('presence');
+            ref.on('value', snapshot => {
+                const now = Math.floor(Date.now() / 1000);
+                onlineUsers = {};
+                snapshot.forEach(child => {
+                    const d = child.val();
+                    // Считаем онлайн если пульс был не позже PRESENCE_TIMEOUT секунд назад
+                    if (d && d.ts && (now - d.ts) <= PRESENCE_TIMEOUT) {
+                        onlineUsers[d.callsign.toLowerCase()] = d;
+                    }
+                });
+                updateOnlineUI();
+            });
+        }
+
+        function updateOnlineUI() {
+            const count = Object.keys(onlineUsers).length;
+            const el = document.getElementById('onlineCount');
+            if (el) el.textContent = count;
+
+            // Обновляем точки в таблице состава (если она открыта)
+            document.querySelectorAll('.roster-online-cell').forEach(cell => {
+                const cs = cell.dataset.callsign?.toLowerCase();
+                if (!cs) return;
+                const isOnline = !!onlineUsers[cs];
+                cell.innerHTML = isOnline
+                    ? '<span class="online-dot" title="Онлайн"></span>'
+                    : '<span class="offline-dot" title="Офлайн"></span>';
+            });
+        }
         
         let agentsDB = [];
         let fleetDB = [];
@@ -1856,12 +1890,11 @@
         };
 
         window.logout = function() {
+            stopHeartbeat();
             currentUser = null;
             sessionStorage.removeItem('mtf7_session');
             sessionStorage.removeItem('mtf7_section');
             document.getElementById('fleetRegisterBtn').classList.add('hidden');
-            // Скрываем поиск при выходе
-            document.getElementById('searchWrapper').classList.add('hidden');
             location.reload();
         };
 
@@ -1932,8 +1965,8 @@
             // Загружаем данные с использованием CORS прокси
             loadDataWithCORS();
 
-            // Инициализация поиска по тексту (только для авторизованных)
-            initTextSearch();
+            // Инициализация Firebase (онлайн-присутствие)
+            initFirebase();
         });
 
         // ЗАГРУЗКА ДАННЫХ — БЫСТРАЯ СТРАТЕГИЯ
@@ -2055,22 +2088,37 @@
             fleetDB = [];
             agentsDB = [];
             
+            // Проверяем структуру данных - выводим все строки для отладки
+            console.log('Все строки для отладки:');
+            rows.forEach((row, index) => {
+                console.log(`Строка ${index}:`, row);
+            });
+            
             // Пропускаем заголовок (первую строку)
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
                 
-                // Машины (колонки J, K, L, M -> индексы 9, 10, 11, 12)
+                // Машины (колонки J, K, L -> индексы 9, 10, 11)
+                // Давайте найдем все колонки, которые могут содержать данные о машинах
+                for (let j = 0; j < row.length; j++) {
+                    if (row[j] && row[j].toString().toLowerCase().includes('car') || 
+                        row[j] && row[j].toString().match(/[a-zA-Z]/) && row[j].toString().length > 3) {
+                        console.log(`Возможная машина в строке ${i}, колонка ${j}:`, row[j]);
+                    }
+                }
+                
+                // Ищем машины по известным индексам
                 if (row[9] && row[9].toString().trim() !== '') {
                     fleetDB.push({
                         name: row[9].toString().trim(),
                         owner: row[10] ? row[10].toString().trim() : 'Не указан',
-                        speed: row[11] ? row[11].toString().trim() : '-',
-                        photo: row[12] ? row[12].toString().trim() : ''
+                        speed: row[11] ? row[11].toString().trim() : '-'
                     });
                 }
                 
                 // Агенты (колонки A-G -> индексы 0-6)
                 if (row[0] && row[0].toString().trim() !== '') {
+                    // Преобразуем все значения к строке для надежности
                     const callsign = row[0].toString().trim();
                     const code = row[1] ? row[1].toString().trim() : '';
                     const rank = row[2] ? row[2].toString().trim() : 'Unknown';
@@ -2093,12 +2141,16 @@
             
             console.log('Обработано агентов:', agentsDB.length);
             console.log('Обработано машин:', fleetDB.length);
+            console.log('Агенты:', agentsDB);
+            console.log('Машины:', fleetDB);
             
             // Рендерим данные
             renderFleet();
+            
+            // Обновляем сообщение
             updateDataStatus();
 
-            // ВОССТАНОВЛЕНИЕ СЕССИИ
+            // ВОССТАНОВЛЕНИЕ СЕССИИ (если перезагрузка, а не первый вход)
             if (!currentUser) {
                 try {
                     const saved = sessionStorage.getItem('mtf7_session');
@@ -2110,12 +2162,16 @@
                             return sc === ic && a.code === code;
                         });
                         if (agent) {
+                            // Пользователь найден — восстанавливаем без уведомления
                             currentUser = agent;
                             buildSecureInterface();
+                            // Восстанавливаем раздел
                             const savedSection = sessionStorage.getItem('mtf7_section');
                             if (savedSection) setTimeout(() => switchTab(savedSection), 150);
+                            // НЕ показываем sec popup при авто-восстановлении
                             document.getElementById('secPopup')?.classList.add('hidden');
                         } else {
+                            // Пользователь удалён из таблицы — чистим сессию
                             sessionStorage.removeItem('mtf7_session');
                             sessionStorage.removeItem('mtf7_section');
                         }
@@ -2124,8 +2180,10 @@
             }
         }
 
+        // ОБНОВЛЕНИЕ СТАТУСА ДАННЫХ
         function updateDataStatus() {
             const container = document.getElementById('fleetContainer');
+            
             if (agentsDB.length === 0 && fleetDB.length === 0) {
                 container.innerHTML = 
                     '<div style="color:var(--warning); text-align: center; padding: 20px;">' +
@@ -2141,13 +2199,17 @@
             }
         }
 
+        // ОТРИСОВКА МАШИН
         function renderFleet() {
             const container = document.getElementById('fleetContainer');
+            
             if (fleetDB.length === 0) {
                 updateDataStatus();
                 return;
             }
+            
             container.innerHTML = '';
+            
             fleetDB.forEach(car => {
                 const card = document.createElement('div');
                 card.className = 'car-card';
@@ -2158,11 +2220,11 @@
                         <span style="color: var(--accent);">${car.speed}</span>
                     </div>
                 `;
-                card.addEventListener('click', () => openCarModal(car));
                 container.appendChild(card);
             });
         }
 
+        // ПОКАЗ ОШИБКИ
         function showError() {
             document.getElementById('fleetContainer').innerHTML = 
                 '<div style="color:var(--danger); padding: 20px; text-align: center;">' +
@@ -2188,8 +2250,10 @@
             }
 
             const agent = agentsDB.find(a => {
+                // Сравниваем позывной без учета регистра и пробелов
                 const inputCallsign = u.toLowerCase().replace(/\s+/g, '');
                 const dbCallsign = a.callsign.toLowerCase().replace(/\s+/g, '');
+                
                 return dbCallsign === inputCallsign && a.code === p;
             });
 
@@ -2203,20 +2267,22 @@
             }
         }
 
-        // ПОСТРОЕНИЕ ИНТЕРФЕЙСА
+        // ПОСТРОЕНИЕ ИНТЕРФЕЙСА (ГЛАВНАЯ ЛОГИКА)
         function buildSecureInterface() {
+            // Обновляем статус
             document.getElementById('userDisplay').innerHTML = `
                 <div style="color: var(--accent);">${currentUser.callsign}</div>
                 <div style="font-size:10px; color:var(--success)">${currentUser.rank.toUpperCase()}</div>
             `;
 
+            // ПОКАЗАТЬ КНОПКУ РЕЕСТРА ТРАНСПОРТА ДЛЯ АВТОРИЗОВАННЫХ
             document.getElementById('fleetRegisterBtn').classList.remove('hidden');
+
+            // СКРЫТЬ КНОПКУ АВТОРИЗАЦИИ, ПОКАЗАТЬ КНОПКУ ПЕРЕЗАГРУЗКИ
             document.querySelector('.auth-btn').classList.add('hidden');
             document.getElementById('reloadBtn').classList.add('visible');
 
-            // Показываем поиск авторизованным
-            document.getElementById('searchWrapper').classList.remove('hidden');
-
+            // СОХРАНИТЬ СЕССИЮ
             if (currentUser) {
                 try {
                     sessionStorage.setItem('mtf7_session', JSON.stringify({
@@ -2226,9 +2292,14 @@
                 } catch(e) {}
             }
 
+            // ПОКАЗАТЬ УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ
             showSecPopup();
 
+            // ЗАПУСТИТЬ ПУЛЬС ПРИСУТСТВИЯ
+            startHeartbeat();
+
             const nav = document.getElementById('navMenu');
+            // Сброс меню
             let menuHTML = `<button onclick="switchTab('public'); closeMobileMenu();" class="nav-btn active"><i class="fas fa-globe"></i> Общая информация</button>`;
 
             const r = currentUser.rank.toLowerCase();
@@ -2236,14 +2307,20 @@
             const isCommander = r.includes('commander') || r.includes('deputy') || r.includes('sub') || r.includes('c.mtf') || r.includes('sub.mtf');
             const isSenior = r.includes('senior') || r.includes('s.mtf');
 
+            // --- ЛОГИКА ОТОБРАЖЕНИЯ ---
+            
             if (isTrainee) {
+                // СТАЖЕР: Видит только обучение и устав
                 menuHTML += `<div class="nav-category">ОБУЧЕНИЕ</div>`;
                 menuHTML += `<button onclick="switchTab('traineeSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-user-graduate"></i> Для стажера</button>`;
                 menuHTML += `<button onclick="switchTab('structureSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-sitemap"></i> Структура MTF-7</button>`;
                 menuHTML += `<button onclick="switchTab('charterSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-book"></i> Устав группы</button>`;
                 menuHTML += `<button onclick="switchTab('punishmentSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-gavel"></i> Система наказаний</button>`;
+                
+                // Сразу открываем раздел стажера
                 setTimeout(() => switchTab('traineeSection'), 100);
             } else {
+                // АГЕНТ: Не видит "Раздел Стажера". Видит работу.
                 menuHTML += `<div class="nav-category">РАБОЧАЯ ЗОНА</div>`;
                 menuHTML += `<button onclick="switchTab('structureSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-sitemap"></i> Структура MTF-7</button>`;
                 menuHTML += `<button onclick="switchTab('charterSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-book"></i> Устав группы</button>`;
@@ -2256,6 +2333,7 @@
                     menuHTML += `<button onclick="switchTab('trtSection'); closeMobileMenu();" class="nav-btn"><i class="fas fa-crosshairs"></i> Протоколы TRT</button>`;
                 }
                 
+                // Сразу открываем Устав или первый доступный раздел
                 setTimeout(() => switchTab('structureSection'), 100);
             }
 
@@ -2265,12 +2343,13 @@
                 setTimeout(() => renderRoster(), 100);
             }
 
+            // Кнопка выхода
             menuHTML += `<button onclick="logout()" class="nav-btn" style="margin-top:20px; color:var(--danger)"><i class="fas fa-sign-out-alt"></i> ВЫХОД</button>`;
             
             nav.innerHTML = menuHTML;
         }
 
-        // СОСТАВ
+        // СОСТАВ — ЧИСТАЯ ТАБЛИЦА
         function renderRoster() {
             const tbody = document.getElementById('rosterTbody');
             if (!tbody) return;
@@ -2285,14 +2364,20 @@
                 const isCmd = a.rank.toLowerCase().includes('commander') || a.rank.toLowerCase().includes('sub');
 
                 let statusClass = 's-leave';
-                if (a.status.toLowerCase().includes('active'))   statusClass = 's-active';
+                if (a.status.toLowerCase().includes('active'))        statusClass = 's-active';
                 else if (a.status.toLowerCase().includes('inactive')) statusClass = 's-inactive';
 
-                let rowClass = hasPunish ? 'row-punished' : (isCmd ? 'row-commander' : '');
+                const rowClass = hasPunish ? 'row-punished' : (isCmd ? 'row-commander' : '');
+                const isOnline = !!onlineUsers[a.callsign.toLowerCase()];
 
                 const tr = document.createElement('tr');
                 tr.className = rowClass;
                 tr.innerHTML = `
+                    <td class="roster-online-cell" data-callsign="${a.callsign}" style="width:22px; padding: 13px 6px 13px 14px;">
+                        ${isOnline
+                            ? '<span class="online-dot" title="Онлайн"></span>'
+                            : '<span class="offline-dot" title="Офлайн"></span>'}
+                    </td>
                     <td class="roster-td-callsign">${a.callsign}</td>
                     <td class="roster-td-rank">${a.rank}</td>
                     <td class="roster-td-dept">${depts.join(' / ') || '—'}</td>
@@ -2336,38 +2421,20 @@
             }
         };
 
-        // МОДАЛ МАШИНЫ
-        window.openCarModal = function(car) {
-            document.getElementById('modalCarName').textContent = car.name;
-            document.getElementById('modalCarOwner').textContent = 'Информация о транспорте';
-            document.getElementById('modalCarOwnerValue').textContent = car.owner;
-            document.getElementById('modalCarSpeed').textContent = car.speed;
-            document.getElementById('modalCarModel').textContent = car.name;
-            const photoEl = document.getElementById('modalCarPhoto');
-            if (car.photo) {
-                photoEl.innerHTML = `<a href="${car.photo}" target="_blank" style="color: var(--accent);">${car.photo}</a>`;
-            } else {
-                photoEl.textContent = 'Нет ссылки';
-            }
-            document.getElementById('carModal').classList.add('open');
-        };
-
-        window.closeCarModal = function(e) {
-            if (e.target === document.getElementById('carModal')) {
-                document.getElementById('carModal').classList.remove('open');
-            }
-        };
-
-        // === ЗАЩИТА ОТ СКРИНШОТОВ (без изменений) ===
+        // === ЗАЩИТА ОТ СКРИНШОТОВ v3 ===
+        // Логика: щит активен только когда currentSection !== 'public' И пользователь залогинен
+        // ПК: блокируем по клавишам + blur
+        // Мобайл: visibilitychange (смена вкладки / переход в другое приложение)
         (function() {
             const shield = document.getElementById('screenshotShield');
             if (!shield) return;
 
             const heldKeys = new Set();
             let hideTimer = null;
-            let shieldPCTimer = null;
+            let shieldPCTimer = null; // для авто-скрытия после ПКМ
 
             function isProtectedPage() {
+                // Защита только если залогинен и не на публичной странице
                 return currentUser !== null && currentSection !== 'public';
             }
 
@@ -2375,6 +2442,7 @@
                 if (!isProtectedPage()) return;
                 shield.style.display = 'block';
                 clearTimeout(hideTimer);
+                // Затираем буфер обмена дважды
                 setTimeout(() => { try { navigator.clipboard.writeText('').catch(()=>{}); } catch(e){} }, 60);
                 setTimeout(() => { try { navigator.clipboard.writeText('').catch(()=>{}); } catch(e){} }, 600);
             }
@@ -2384,6 +2452,7 @@
                 hideTimer = setTimeout(() => { shield.style.display = 'none'; }, delay || 0);
             }
 
+            // === ПК: перехват клавиш ===
             function isDangerous() {
                 if (heldKeys.has('PrintScreen')) return true;
                 if (heldKeys.has('Meta') && heldKeys.has('Shift')) return true;
@@ -2406,6 +2475,7 @@
                 }
             }, true);
 
+            // ПКМ убирает щит через ~200мс (чтобы не мешало работе с сайтом)
             document.addEventListener('mousedown', function(e) {
                 if (e.button === 2 && shield.style.display === 'block') {
                     clearTimeout(hideTimer);
@@ -2423,22 +2493,32 @@
         // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         window.switchTab = function(id) {
             currentSection = id;
+            // Сохраняем текущий раздел для восстановления после перезагрузки
             if (currentUser) {
                 try { sessionStorage.setItem('mtf7_section', id); } catch(e) {}
             }
 
+            // Скрыть все секции
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            // Убрать активный класс у кнопок
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             
+            // Показать нужную секцию
             const section = document.getElementById(id);
-            if(section) section.classList.add('active');
+            if(section) {
+                section.classList.add('active');
+            }
             
+            // Подсветить кнопку (ищем по onclick аттрибуту)
             const btns = document.querySelectorAll('.nav-btn');
             btns.forEach(btn => {
                 const onclickAttr = btn.getAttribute('onclick');
-                if(onclickAttr && onclickAttr.includes(id)) btn.classList.add('active');
+                if(onclickAttr && onclickAttr.includes(id)) {
+                    btn.classList.add('active');
+                }
             });
 
+            // Обновить заголовок
             const titles = {
                 'public': 'ОБЩАЯ ИНФОРМАЦИЯ',
                 'traineeSection': 'ДЛЯ СТАЖЕРА',
@@ -2451,12 +2531,12 @@
             };
             document.getElementById('pageTitle').innerText = titles[id] || 'SECURE ACCESS';
             
+            // Прокрутка вверх на мобильных
             if (window.innerWidth <= 768) {
                 document.querySelector('.scroll-container').scrollTop = 0;
             }
         }
-
-        // УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ
+        // === УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ ===
         function showSecPopup() {
             const popup = document.getElementById('secPopup');
             if (popup) popup.classList.remove('hidden');
@@ -2467,12 +2547,13 @@
             if (popup) popup.classList.add('hidden');
         };
 
-        // МЯГКАЯ ПЕРЕЗАГРУЗКА
+        // === МЯГКАЯ ПЕРЕЗАГРУЗКА (без выброса из сессии) ===
         window.softReload = async function() {
             const btn = document.getElementById('reloadBtn');
             const icon = btn ? btn.querySelector('i') : null;
             if (icon) icon.classList.add('fa-spin');
 
+            // Сбрасываем кэш
             try {
                 sessionStorage.removeItem(CACHE_KEY);
                 sessionStorage.removeItem(CACHE_TIME_KEY);
@@ -2482,187 +2563,33 @@
                 await loadDataWithCORS();
             } catch(e) {}
 
+            // После перезагрузки данных — перерисовываем то, что видит пользователь
             if (currentUser) {
-                if (currentSection === 'rosterSection') renderRoster();
+                // Обновляем состав если открыт
+                if (currentSection === 'rosterSection') {
+                    renderRoster();
+                }
+                // Проверяем что текущий пользователь ещё есть в базе
                 const stillExists = agentsDB.find(a => {
                     const sc = a.callsign.toLowerCase().replace(/\s+/g, '');
                     const ic = currentUser.callsign.toLowerCase().replace(/\s+/g, '');
                     return sc === ic && a.code === currentUser.code;
                 });
                 if (!stillExists) {
+                    // Удалён из таблицы — выход
                     sessionStorage.removeItem('mtf7_session');
                     sessionStorage.removeItem('mtf7_section');
                     location.reload();
                     return;
                 }
+                // Обновляем объект currentUser свежими данными из таблицы
                 currentUser = stillExists;
             }
 
             if (icon) icon.classList.remove('fa-spin');
         };
 
-        // === ПОИСК ПО ТЕКСТУ (только для авторизованных) ===
-        function initTextSearch() {
-            const searchInput = document.getElementById('globalSearch');
-            const searchResults = document.getElementById('searchResults');
-            const searchWrapper = document.getElementById('searchWrapper');
-            let searchTimeout;
-
-            // Проверяем, авторизован ли пользователь при загрузке
-            if (!currentUser) {
-                searchWrapper.classList.add('hidden');
-            }
-
-            searchInput.addEventListener('input', function() {
-                // Если пользователь не авторизован, ничего не делаем
-                if (!currentUser) return;
-
-                clearTimeout(searchTimeout);
-                const query = this.value.trim().toLowerCase();
-                if (query.length < 3) {
-                    searchResults.classList.add('hidden');
-                    return;
-                }
-                searchTimeout = setTimeout(() => performTextSearch(query), 400);
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.classList.add('hidden');
-                }
-            });
-        }
-
-        // Получить список доступных разделов в зависимости от ранга
-        function getAllowedSections() {
-            if (!currentUser) return [];
-
-            const r = currentUser.rank.toLowerCase();
-            const isTrainee = r.includes('trainee') || r.includes('cadet') || r.includes('стажер') || r.includes('tr.mtf');
-            const isCommander = r.includes('commander') || r.includes('deputy') || r.includes('sub') || r.includes('c.mtf') || r.includes('sub.mtf');
-            const isSenior = r.includes('senior') || r.includes('s.mtf');
-
-            const sections = [
-                { id: 'traineeSection', name: 'Для стажера', access: isTrainee },
-                { id: 'structureSection', name: 'Структура MTF-7', access: true }, // доступно всем агентам и стажерам
-                { id: 'charterSection', name: 'Устав группы', access: true },
-                { id: 'punishmentSection', name: 'Система наказаний', access: true },
-                { id: 'cidSection', name: 'Протоколы CID', access: currentUser.isCID },
-                { id: 'trtSection', name: 'Протоколы TRT', access: currentUser.isTRT },
-                { id: 'rosterSection', name: 'Личный состав', access: isCommander || isSenior }
-            ];
-            // public не включаем, т.к. поиск по публичной информации не требуется
-            return sections.filter(s => s.access);
-        }
-
-        function performTextSearch(query) {
-            const allowedSections = getAllowedSections();
-            if (allowedSections.length === 0) return;
-
-            const results = [];
-
-            allowedSections.forEach(s => {
-                const sectionEl = document.getElementById(s.id);
-                if (!sectionEl) return;
-                const text = sectionEl.innerText || sectionEl.textContent;
-                const lowerText = text.toLowerCase();
-                if (lowerText.includes(query)) {
-                    const index = lowerText.indexOf(query);
-                    const start = Math.max(0, index - 50);
-                    const end = Math.min(text.length, index + 50);
-                    let context = text.substring(start, end).replace(/\s+/g, ' ').trim();
-                    if (start > 0) context = '…' + context;
-                    if (end < text.length) context = context + '…';
-                    results.push({
-                        sectionId: s.id,
-                        sectionName: s.name,
-                        context: context
-                    });
-                }
-            });
-
-            renderTextSearchResults(results, query);
-        }
-
-        function renderTextSearchResults(results, query) {
-            const container = document.getElementById('searchResults');
-            if (results.length === 0) {
-                container.innerHTML = '<div class="search-result-item" style="color: var(--text-dim);">Ничего не найдено</div>';
-            } else {
-                container.innerHTML = '';
-                results.slice(0, 10).forEach(r => {
-                    const div = document.createElement('div');
-                    div.className = 'search-result-item';
-                    div.innerHTML = `
-                        <div class="result-title">${r.sectionName}</div>
-                        <div class="result-sub">${r.context}</div>
-                    `;
-                    div.addEventListener('click', () => {
-                        switchTab(r.sectionId);
-                        highlightInSection(r.sectionId, query);
-                        document.getElementById('globalSearch').value = '';
-                        container.classList.add('hidden');
-                    });
-                    container.appendChild(div);
-                });
-            }
-            container.classList.remove('hidden');
-        }
-
-        function highlightInSection(sectionId, query) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
-
-            // Убираем предыдущие подсветки
-            const highlights = section.querySelectorAll('.highlight');
-            highlights.forEach(el => {
-                const parent = el.parentNode;
-                parent.replaceChild(document.createTextNode(el.textContent), el);
-                parent.normalize();
-            });
-
-            // Ищем текст во всех элементах, кроме скриптов, стилей и т.д.
-            const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
-                acceptNode: function(node) {
-                    if (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
-                    return NodeFilter.FILTER_ACCEPT;
-                }
-            });
-            const nodesToReplace = [];
-            while (walker.nextNode()) {
-                const node = walker.currentNode;
-                const text = node.nodeValue;
-                const lower = text.toLowerCase();
-                if (lower.includes(query)) {
-                    nodesToReplace.push(node);
-                }
-            }
-
-            nodesToReplace.forEach(node => {
-                const text = node.nodeValue;
-                const lower = text.toLowerCase();
-                const index = lower.indexOf(query);
-                if (index === -1) return;
-                const before = document.createTextNode(text.substring(0, index));
-                const match = document.createElement('span');
-                match.className = 'highlight';
-                match.textContent = text.substring(index, index + query.length);
-                const after = document.createTextNode(text.substring(index + query.length));
-                const fragment = document.createDocumentFragment();
-                fragment.appendChild(before);
-                fragment.appendChild(match);
-                fragment.appendChild(after);
-                node.parentNode.replaceChild(fragment, node);
-            });
-
-            // Прокрутка к первому выделенному
-            const firstHighlight = section.querySelector('.highlight');
-            if (firstHighlight) {
-                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        // Drag logic для sec-popup (без изменений)
+        // Drag logic для sec-popup
         (function() {
             const popup = document.getElementById('secPopup');
             const handle = document.getElementById('secPopupDrag');
@@ -2713,5 +2640,37 @@
         })();
 
     </script>
+<!--
+════════════════════════════════════════════════════════
+  КАК НАСТРОИТЬ FIREBASE (онлайн-присутствие)
+  Занимает ~5 минут, бесплатно
+════════════════════════════════════════════════════════
+
+1. Зайди на https://console.firebase.google.com
+2. "Add project" → дай имя (напр. mtf7-portal) → Continue → Continue → Create project
+3. Слева меню: Build → Realtime Database → Create Database
+   → Start in TEST MODE → Enable
+4. Скопируй URL базы (вида https://mtf7-portal-default-rtdb.firebaseio.com)
+5. Слева: Project Overview (шестерёнка) → Project settings
+   → вкладка "General" → внизу "Your apps" → "</>" (Web)
+   → дай имя → Register app
+   → скопируй объект firebaseConfig
+6. Вставь данные в переменную FIREBASE_CONFIG в начале скрипта:
+   apiKey, authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId
+
+7. Правила безопасности (Realtime Database → Rules):
+{
+  "rules": {
+    "presence": {
+      ".read":  true,
+      ".write": true
+    }
+  }
+}
+→ Publish
+
+Готово. Онлайн-точки появятся автоматически.
+════════════════════════════════════════════════════════
+-->
 </body>
 </html>
