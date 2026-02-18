@@ -423,6 +423,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background: #000;
             z-index: 99999;
+            pointer-events: none;
         }
         @media print {
             body * { visibility: hidden !important; }
@@ -437,169 +438,93 @@
             }
         }
 
-        /* === СОСТАВ: ШАПКА СО СТАТИСТИКОЙ === */
-        .roster-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 35px;
-        }
-        .stat-block {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-top: 3px solid var(--accent);
-            padding: 20px;
-            text-align: center;
-        }
-        .stat-block .stat-num {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--accent);
-            line-height: 1;
-            display: block;
-        }
-        .stat-block .stat-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 6px;
-            display: block;
-        }
-        .stat-block.stat-active { border-top-color: var(--success); }
-        .stat-block.stat-active .stat-num { color: var(--success); }
-        .stat-block.stat-warn { border-top-color: var(--danger); }
-        .stat-block.stat-warn .stat-num { color: var(--danger); }
-        .stat-block.stat-cid { border-top-color: #4a9eff; }
-        .stat-block.stat-cid .stat-num { color: #4a9eff; }
-
-        /* === СОСТАВ: ФИЛЬТРЫ === */
-        .roster-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .roster-search {
-            flex: 1;
-            min-width: 200px;
-            padding: 10px 16px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 12px;
-        }
-        .roster-search:focus { outline: none; border-color: var(--accent); }
-        .filter-btn {
-            padding: 10px 18px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            font-family: inherit;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: 0.2s;
-        }
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--accent);
-            color: var(--bg-body);
-            border-color: var(--accent);
-        }
-
-        /* === СОСТАВ: КАРТОЧКИ АГЕНТОВ === */
-        .roster-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 16px;
-        }
-        .agent-card {
+        /* === УВЕДОМЛЕНИЕ О ЗАЩИТЕ === */
+        .security-notice {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             background: var(--bg-panel);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--text-muted);
-            padding: 0;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            border-left: 3px solid var(--danger);
+            padding: 10px 14px;
+            font-size: 10px;
+            color: var(--text-muted);
+            z-index: 900;
+            max-width: 260px;
+            line-height: 1.5;
+            pointer-events: none;
         }
-        .agent-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--shadow);
-            border-left-color: var(--accent);
-        }
-        .agent-card.is-commander { border-left-color: var(--warning); }
-        .agent-card.is-commander:hover { border-left-color: var(--warning); }
-        .agent-card.has-punishment { border-left-color: var(--danger); }
-        .agent-card.has-punishment:hover { border-left-color: var(--danger); }
-
-        .agent-card-header {
-            padding: 20px 20px 14px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 1px solid var(--border);
-        }
-        .agent-callsign {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent);
+        .security-notice strong {
+            color: var(--danger);
+            display: block;
+            margin-bottom: 3px;
+            font-size: 10px;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .agent-rank-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-top: 3px;
+        @media (max-width: 768px) {
+            .security-notice {
+                bottom: 10px;
+                right: 10px;
+                max-width: 200px;
+                font-size: 9px;
+                padding: 8px 11px;
+            }
+        }
+
+        /* === СОСТАВ: ЧИСТЫЙ СПИСОК === */
+        .roster-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .roster-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+            border-radius: 2px;
+        }
+        .roster-row:first-child { border-top: 1px solid var(--border); }
+        .roster-row:hover { background: var(--bg-hover); padding-left: 8px; }
+        .roster-row:last-child { border-bottom: 1px solid var(--border); }
+
+        .roster-agent-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
             letter-spacing: 0.5px;
         }
-        .agent-status-dot {
-            width: 10px; height: 10px;
+        .roster-agent-rank {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+        .roster-agent-dept {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+        }
+        .roster-status-dot {
+            width: 8px; height: 8px;
             border-radius: 50%;
-            margin-top: 6px;
             flex-shrink: 0;
         }
-        .agent-status-dot.active { background: var(--success); box-shadow: 0 0 6px var(--success); }
-        .agent-status-dot.inactive { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
-        .agent-status-dot.leave { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+        .roster-status-dot.active  { background: var(--success); box-shadow: 0 0 5px var(--success); }
+        .roster-status-dot.inactive { background: var(--danger);  box-shadow: 0 0 5px var(--danger); }
+        .roster-status-dot.leave   { background: var(--warning);  box-shadow: 0 0 5px var(--warning); }
 
-        .agent-card-body {
-            padding: 14px 20px 18px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 10px;
-        }
-        .agent-dept-tags {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .dept-tag {
+        .roster-punish-tag {
             font-size: 10px;
             font-weight: 700;
-            padding: 4px 10px;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .dept-tag.trt { border-color: var(--danger); color: var(--danger); background: rgba(207,52,52,0.08); }
-        .dept-tag.cid { border-color: #4a9eff; color: #4a9eff; background: rgba(74,158,255,0.08); }
-
-        .agent-punishment-badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 4px 10px;
-            background: rgba(207,52,52,0.12);
-            border: 1px solid var(--danger);
             color: var(--danger);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             white-space: nowrap;
         }
 
@@ -690,12 +615,6 @@
             .top-bar {
                 padding: 0 30px;
             }
-        }
-
-        /* Медиа для карточек состава */
-        @media (max-width: 900px) {
-            .roster-stats { grid-template-columns: repeat(2, 1fr); }
-            .roster-grid { grid-template-columns: 1fr; }
         }
 
         /* Телефоны */
@@ -894,6 +813,12 @@
 <body>
 
     <div id="screenshotShield"></div>
+
+    <!-- Уведомление о системе защиты -->
+    <div class="security-notice">
+        <strong><i class="fas fa-shield-alt"></i> &nbsp;Система мониторинга активна</strong>
+        Съёмка экрана заблокирована. Распространение информации посторонним лицам запрещено и влечёт немедленное отстранение.
+    </div>
 
     <!-- Модал агента -->
     <div class="agent-modal-overlay" id="agentModal" onclick="closeAgentModal(event)">
@@ -1723,40 +1648,10 @@
                             <p>База данных сотрудников и дисциплинарные взыскания</p>
                         </div>
                     </div>
-
-                    <!-- Статистика -->
-                    <div class="roster-stats">
-                        <div class="stat-block">
-                            <span class="stat-num" id="statTotal">—</span>
-                            <span class="stat-label">Всего агентов</span>
+                    <div class="card">
+                        <div class="roster-list" id="rosterList">
+                            <!-- Заполняется через JS -->
                         </div>
-                        <div class="stat-block stat-active">
-                            <span class="stat-num" id="statActive">—</span>
-                            <span class="stat-label">Активны</span>
-                        </div>
-                        <div class="stat-block stat-warn">
-                            <span class="stat-num" id="statPunished">—</span>
-                            <span class="stat-label">Взыскания</span>
-                        </div>
-                        <div class="stat-block stat-cid">
-                            <span class="stat-num" id="statTRT">—</span>
-                            <span class="stat-label">TRT / CID</span>
-                        </div>
-                    </div>
-
-                    <!-- Поиск и фильтры -->
-                    <div class="roster-filters">
-                        <input type="text" class="roster-search" id="rosterSearch" placeholder="Поиск по позывному..." oninput="filterRoster()">
-                        <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Все</button>
-                        <button class="filter-btn" data-filter="trt" onclick="setFilter('trt', this)">TRT</button>
-                        <button class="filter-btn" data-filter="cid" onclick="setFilter('cid', this)">CID</button>
-                        <button class="filter-btn" data-filter="active" onclick="setFilter('active', this)">Active</button>
-                        <button class="filter-btn" data-filter="punished" onclick="setFilter('punished', this)">Взыскания</button>
-                    </div>
-
-                    <!-- Карточки агентов -->
-                    <div class="roster-grid" id="rosterGrid">
-                        <!-- Заполняется через JS -->
                     </div>
                 </section>
 
@@ -1772,6 +1667,7 @@
         let fleetDB = [];
         let currentUser = null;
         let currentTheme = 'dark';
+        let currentSection = 'public'; // для логики защиты скриншотов
 
         // ГЛОБАЛЬНЫЕ ФУНКЦИИ
         window.toggleLogin = function() {
@@ -2182,100 +2078,37 @@
             nav.innerHTML = menuHTML;
         }
 
-        // ТАБЛИЦА СОСТАВА — КАРТОЧКИ
-        let currentFilter = 'all';
-        let allAgentsRendered = [];
-
+        // СОСТАВ — ЧИСТЫЙ СПИСОК
         function renderRoster() {
-            allAgentsRendered = agentsDB.slice();
-            updateRosterStats();
-            renderFilteredRoster();
-        }
+            const list = document.getElementById('rosterList');
+            if (!list) return;
+            list.innerHTML = '';
 
-        function updateRosterStats() {
-            const total = agentsDB.length;
-            const active = agentsDB.filter(a => a.status.toLowerCase().includes('active')).length;
-            const punished = agentsDB.filter(a => a.punishment && a.punishment.trim() !== '').length;
-            const trtOrCid = agentsDB.filter(a => a.isTRT || a.isCID).length;
-
-            const el = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
-            el('statTotal', total);
-            el('statActive', active);
-            el('statPunished', punished);
-            el('statTRT', trtOrCid);
-        }
-
-        window.setFilter = function(filter, btn) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderFilteredRoster();
-        };
-
-        window.filterRoster = function() {
-            renderFilteredRoster();
-        };
-
-        function renderFilteredRoster() {
-            const grid = document.getElementById('rosterGrid');
-            if (!grid) return;
-
-            const search = (document.getElementById('rosterSearch')?.value || '').toLowerCase().trim();
-
-            let filtered = agentsDB.filter(a => {
-                const matchSearch = !search || a.callsign.toLowerCase().includes(search) || a.rank.toLowerCase().includes(search);
-                let matchFilter = true;
-                if (currentFilter === 'trt') matchFilter = a.isTRT;
-                else if (currentFilter === 'cid') matchFilter = a.isCID;
-                else if (currentFilter === 'active') matchFilter = a.status.toLowerCase().includes('active');
-                else if (currentFilter === 'punished') matchFilter = a.punishment && a.punishment.trim() !== '';
-                return matchSearch && matchFilter;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div style="color:var(--text-muted); padding:40px; text-align:center; font-size:13px; grid-column: 1/-1;"><i class="fas fa-search" style="margin-bottom:10px; display:block; font-size:24px;"></i>Нет агентов по выбранному фильтру</div>`;
-                return;
-            }
-
-            grid.innerHTML = '';
-            filtered.forEach(a => {
-                const isCommander = a.rank.toLowerCase().includes('commander') || a.rank.toLowerCase().includes('sub');
-                const hasPunish = a.punishment && a.punishment.trim() !== '';
-
+            agentsDB.forEach(a => {
                 let statusClass = 'leave';
-                if (a.status.toLowerCase().includes('active')) statusClass = 'active';
+                if (a.status.toLowerCase().includes('active'))   statusClass = 'active';
                 else if (a.status.toLowerCase().includes('inactive')) statusClass = 'inactive';
 
-                let cardClass = 'agent-card';
-                if (hasPunish) cardClass += ' has-punishment';
-                else if (isCommander) cardClass += ' is-commander';
+                let depts = [];
+                if (a.isTRT) depts.push('TRT');
+                if (a.isCID) depts.push('CID');
 
-                let deptTags = '';
-                if (a.isTRT) deptTags += `<span class="dept-tag trt"><i class="fas fa-crosshairs"></i> TRT</span>`;
-                if (a.isCID) deptTags += `<span class="dept-tag cid"><i class="fas fa-search"></i> CID</span>`;
-                if (!a.isTRT && !a.isCID) deptTags += `<span class="dept-tag">—</span>`;
+                const hasPunish = a.punishment && a.punishment.trim() !== '';
 
-                let punishBadge = hasPunish
-                    ? `<span class="agent-punishment-badge"><i class="fas fa-gavel"></i> ${a.punishment}</span>`
-                    : '';
-
-                const card = document.createElement('div');
-                card.className = cardClass;
-                card.innerHTML = `
-                    <div class="agent-card-header">
-                        <div>
-                            <div class="agent-callsign">${a.callsign}</div>
-                            <div class="agent-rank-label">${a.rank}</div>
-                        </div>
-                        <span class="agent-status-dot ${statusClass}" title="${a.status}"></span>
+                const row = document.createElement('div');
+                row.className = 'roster-row';
+                row.title = 'Нажмите для подробностей';
+                row.innerHTML = `
+                    <div>
+                        <div class="roster-agent-name">${a.callsign}</div>
+                        <div class="roster-agent-rank">${a.rank}</div>
                     </div>
-                    <div class="agent-card-body">
-                        <div class="agent-dept-tags">${deptTags}</div>
-                        ${punishBadge}
-                    </div>
+                    <div class="roster-agent-dept">${depts.join(' / ') || '—'}</div>
+                    <div>${hasPunish ? `<span class="roster-punish-tag"><i class="fas fa-gavel"></i> ${a.punishment}</span>` : ''}</div>
+                    <span class="roster-status-dot ${statusClass}" title="${a.status}"></span>
                 `;
-                card.addEventListener('click', () => openAgentModal(a));
-                grid.appendChild(card);
+                row.addEventListener('click', () => openAgentModal(a));
+                list.appendChild(row);
             });
         }
 
@@ -2311,91 +2144,109 @@
             }
         };
 
-        // === ЗАЩИТА ОТ СКРИНШОТОВ v2 ===
+        // === ЗАЩИТА ОТ СКРИНШОТОВ v3 ===
+        // Логика: щит активен только когда currentSection !== 'public' И пользователь залогинен
+        // ПК: блокируем по клавишам + blur
+        // Мобайл: visibilitychange (смена вкладки / переход в другое приложение)
         (function() {
             const shield = document.getElementById('screenshotShield');
             if (!shield) return;
 
-            // Набор зажатых сейчас клавиш
             const heldKeys = new Set();
             let hideTimer = null;
+            let shieldPCTimer = null; // для авто-скрытия после ПКМ
 
-            // Опасные модификаторы и ключи
-            // Логика: щит показывается КАК ТОЛЬКО зажат любой из опасных модификаторов
-            // Это покрывает Win+Shift+S — щит встаёт ещё до нажатия S
-            // Снимается через 1.5сек ПОСЛЕ того как ВСЕ опасные клавиши отпущены
-            const DANGER_KEYS = new Set([
-                'PrintScreen', 'Meta', 'Shift', 'Alt'
-            ]);
+            function isProtectedPage() {
+                // Защита только если залогинен и не на публичной странице
+                return currentUser !== null && currentSection !== 'public';
+            }
 
-            // Комбинации, при которых щит точно нужен (проверяем при каждом keydown)
+            function showShield() {
+                if (!isProtectedPage()) return;
+                shield.style.display = 'block';
+                clearTimeout(hideTimer);
+                // Затираем буфер обмена дважды
+                setTimeout(() => { try { navigator.clipboard.writeText('').catch(()=>{}); } catch(e){} }, 60);
+                setTimeout(() => { try { navigator.clipboard.writeText('').catch(()=>{}); } catch(e){} }, 600);
+            }
+
+            function hideShield(delay) {
+                clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => { shield.style.display = 'none'; }, delay || 0);
+            }
+
+            // === ПК: перехват клавиш ===
             function isDangerous() {
-                // PrintScreen в любом сочетании
                 if (heldKeys.has('PrintScreen')) return true;
-                // Win/Cmd + Shift — начало Win+Shift+S или macOS скриншотов
                 if (heldKeys.has('Meta') && heldKeys.has('Shift')) return true;
-                // Alt зажат — Alt+PrintScreen
                 if (heldKeys.has('Alt')) return true;
                 return false;
             }
 
-            function showShield() {
-                shield.style.display = 'block';
-                clearTimeout(hideTimer);
-                // Пытаемся затереть буфер обмена через небольшую задержку
-                // (после того как ОС успела что-то туда положить)
-                setTimeout(() => {
-                    try { navigator.clipboard.writeText('').catch(() => {}); } catch(e) {}
-                }, 50);
-                setTimeout(() => {
-                    try { navigator.clipboard.writeText('').catch(() => {}); } catch(e) {}
-                }, 500);
-            }
-
-            function tryHide() {
-                clearTimeout(hideTimer);
-                hideTimer = setTimeout(() => {
-                    if (!isDangerous()) {
-                        shield.style.display = 'none';
-                    }
-                }, 1500); // держим щит 1.5сек после отпускания
-            }
-
             document.addEventListener('keydown', function(e) {
                 heldKeys.add(e.key);
-
                 if (isDangerous()) {
                     showShield();
-                    e.preventDefault(); // попытка предотвратить дефолтное действие
+                    e.preventDefault();
                 }
-            }, true); // capture phase — срабатывает раньше всего
+            }, true);
 
             document.addEventListener('keyup', function(e) {
                 heldKeys.delete(e.key);
                 if (!isDangerous()) {
-                    tryHide();
+                    // Держим щит 1.2сек после отпускания клавиш
+                    hideShield(1200);
                 }
             }, true);
 
-            // Сброс при потере фокуса страницы (Alt+Tab, сворачивание, Snip overlay)
+            // ПКМ убирает щит через ~200мс (чтобы не мешало работе с сайтом)
+            document.addEventListener('mousedown', function(e) {
+                if (e.button === 2 && shield.style.display === 'block') {
+                    clearTimeout(hideTimer);
+                    clearTimeout(shieldPCTimer);
+                    shieldPCTimer = setTimeout(() => {
+                        heldKeys.clear();
+                        shield.style.display = 'none';
+                    }, 200);
+                }
+            });
+
+            // === ПК: потеря фокуса (Alt+Tab, Win+D, Snip overlay) ===
             window.addEventListener('blur', function() {
                 showShield();
             });
 
             window.addEventListener('focus', function() {
-                // Чистим набор зажатых (могли отпустить пока окно было скрыто)
                 heldKeys.clear();
-                tryHide();
+                hideShield(300);
             });
 
-            // Блокировка правой кнопки мыши и drag (уже есть выше, дублируем для надёжности)
-            document.addEventListener('dragstart', e => e.preventDefault());
+            // === МОБАЙЛ: смена вкладки / переход в другое приложение ===
+            // visibilitychange — срабатывает на iOS Safari и Android Chrome
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') {
+                    // Страница скрыта — показываем щит немедленно
+                    if (isProtectedPage()) {
+                        shield.style.display = 'block';
+                    }
+                } else {
+                    // Страница снова видна — убираем щит через небольшую задержку
+                    hideShield(400);
+                }
+            });
 
-            // Скрываем содержимое при печати (уже есть в CSS @media print)
+            // pagehide — дополнительно для iOS (иногда visibilitychange запаздывает)
+            window.addEventListener('pagehide', function() {
+                if (isProtectedPage()) shield.style.display = 'block';
+            });
+
+            document.addEventListener('dragstart', e => e.preventDefault());
         })();
 
         // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         window.switchTab = function(id) {
+            currentSection = id; // обновляем для логики защиты
+
             // Скрыть все секции
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             // Убрать активный класс у кнопок
