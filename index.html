@@ -438,20 +438,18 @@
             }
         }
 
-        /* === УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ (ПЕРЕТАСКИВАЕМОЕ) === */
+        /* === УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ (КОМПАКТНЫЙ ТОСТ) === */
         .sec-popup {
             position: fixed;
-            top: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 380px;
-            max-width: 92vw;
+            bottom: 24px;
+            right: 24px;
+            width: 300px;
+            max-width: calc(100vw - 30px);
             background: var(--bg-panel);
             border: 1px solid var(--border);
-            box-shadow: 0 8px 40px var(--shadow);
+            box-shadow: 0 4px 24px var(--shadow);
             z-index: 4000;
             animation: fadeIn 0.3s ease;
-            cursor: default;
             user-select: none;
         }
         .sec-popup.hidden { display: none; }
@@ -460,7 +458,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 18px;
+            padding: 9px 14px;
             background: var(--bg-input);
             border-bottom: 1px solid var(--border);
             cursor: grab;
@@ -471,49 +469,35 @@
             font-weight: 700;
         }
         .sec-popup-drag:active { cursor: grabbing; }
-        .sec-popup-drag span { display: flex; align-items: center; gap: 8px; }
+        .sec-popup-drag-label { display: flex; align-items: center; gap: 7px; }
         .sec-popup-close {
             background: none; border: none;
             color: var(--text-muted); cursor: pointer;
-            font-size: 14px; padding: 0; line-height: 1;
-            transition: color 0.2s;
+            font-size: 13px; padding: 0; line-height: 1;
+            transition: color 0.15s; flex-shrink: 0;
         }
         .sec-popup-close:hover { color: var(--accent); }
 
         .sec-popup-body {
-            padding: 20px 20px 16px 20px;
+            padding: 14px 14px 12px 14px;
         }
         .sec-popup-body p {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-dim);
-            line-height: 1.7;
-            margin: 0 0 16px 0;
+            line-height: 1.65;
+            margin: 0 0 12px 0;
         }
+        .sec-popup-body p:last-of-type { margin-bottom: 0; }
         .sec-popup-body p strong { color: var(--text-main); }
 
         .sec-popup-footer {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 12px;
+            justify-content: flex-end;
+            padding: 10px 14px 12px 14px;
             border-top: 1px solid var(--border);
-            gap: 12px;
-        }
-        .sec-popup-check {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .sec-popup-check input[type="checkbox"] {
-            accent-color: var(--accent);
-            width: 13px; height: 13px;
-            cursor: pointer;
         }
         .sec-popup-ok {
-            padding: 8px 20px;
+            padding: 7px 18px;
             background: var(--accent);
             color: var(--bg-body);
             border: none;
@@ -527,61 +511,65 @@
         }
         .sec-popup-ok:hover { opacity: 0.85; }
 
-        /* === МОДАЛ АГЕНТА === */
-        .roster-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-        .roster-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto auto;
+        /* === КНОПКА ОБНОВЛЕНИЯ В ТОПБАРЕ === */
+        .reload-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            width: 40px; height: 40px;
+            border-radius: 4px;
+            display: none;
             align-items: center;
-            gap: 15px;
-            padding: 16px 0;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .reload-btn:hover { color: var(--accent); background: var(--bg-hover); }
+        .reload-btn.visible { display: flex; }
+
+        /* === СОСТАВ: ЧИСТАЯ ТАБЛИЦА === */
+        .roster-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            display: table;
+        }
+        .roster-table thead th {
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .roster-table tbody tr {
             border-bottom: 1px solid var(--border);
             cursor: pointer;
-            transition: background 0.15s;
-            border-radius: 2px;
+            transition: background 0.12s;
         }
-        .roster-row:first-child { border-top: 1px solid var(--border); }
-        .roster-row:hover { background: var(--bg-hover); padding-left: 8px; }
-        .roster-row:last-child { border-bottom: 1px solid var(--border); }
-
-        .roster-agent-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.5px;
+        .roster-table tbody tr:last-child { border-bottom: none; }
+        .roster-table tbody tr:hover td { background: var(--bg-hover); }
+        .roster-table tbody tr.row-commander td:first-child {
+            border-left: 2px solid var(--warning);
         }
-        .roster-agent-rank {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-            text-transform: uppercase;
+        .roster-table tbody tr.row-punished td:first-child {
+            border-left: 2px solid var(--danger);
         }
-        .roster-agent-dept {
-            font-size: 11px;
+        .roster-table td {
+            padding: 13px 14px;
             color: var(--text-dim);
-            letter-spacing: 0.5px;
+            vertical-align: middle;
         }
-        .roster-status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .roster-status-dot.active  { background: var(--success); box-shadow: 0 0 5px var(--success); }
-        .roster-status-dot.inactive { background: var(--danger);  box-shadow: 0 0 5px var(--danger); }
-        .roster-status-dot.leave   { background: var(--warning);  box-shadow: 0 0 5px var(--warning); }
-
-        .roster-punish-tag {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--danger);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
+        .roster-td-callsign { color: var(--accent) !important; font-weight: 700; font-size: 14px; }
+        .roster-td-rank     { font-size: 12px; }
+        .roster-td-dept     { font-size: 11px; letter-spacing: 0.5px; }
+        .roster-td-status.s-active   { color: var(--success) !important; }
+        .roster-td-status.s-inactive { color: var(--danger) !important; }
+        .roster-td-status.s-leave    { color: var(--warning) !important; }
+        .roster-td-punish   { font-size: 11px; font-weight: 700; color: var(--danger) !important; }
 
         /* === МОДАЛ АГЕНТА === */
         .agent-modal-overlay {
@@ -872,22 +860,15 @@
     <!-- Уведомление безопасности -->
     <div class="sec-popup hidden" id="secPopup">
         <div class="sec-popup-drag" id="secPopupDrag">
-            <span><i class="fas fa-shield-alt"></i> Уведомление безопасности</span>
+            <span class="sec-popup-drag-label"><i class="fas fa-shield-alt"></i> Уведомление безопасности</span>
             <button class="sec-popup-close" onclick="closeSecPopup()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sec-popup-body">
-            <p>
-                На данном портале активна <strong>система мониторинга</strong>. Съёмка экрана и запись контента на защищённых страницах заблокированы.
-            </p>
-            <p style="margin-bottom:0;">
-                Распространение информации посторонним лицам <strong>строго запрещено</strong> и влечёт немедленное отстранение от службы без права восстановления.
-            </p>
-            <div class="sec-popup-footer">
-                <label class="sec-popup-check">
-                    <input type="checkbox" id="secNoShow"> Не показывать снова
-                </label>
-                <button class="sec-popup-ok" onclick="closeSecPopup()">Принято</button>
-            </div>
+            <p>Активна <strong>система мониторинга</strong>. Съёмка экрана на закрытых страницах заблокирована.</p>
+            <p>Распространение информации посторонним лицам <strong>запрещено</strong> и влечёт немедленное отстранение.</p>
+        </div>
+        <div class="sec-popup-footer">
+            <button class="sec-popup-ok" onclick="closeSecPopup()">Принято</button>
         </div>
     </div>
 
@@ -956,6 +937,9 @@
             <div class="top-bar">
                 <div class="page-title" id="pageTitle">ОБЩАЯ ИНФОРМАЦИЯ</div>
                 <div class="top-controls">
+                    <button id="reloadBtn" class="reload-btn" title="Обновить данные" onclick="softReload()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                     <button id="themeToggle" class="theme-toggle" title="Сменить тему">
                         <i class="fas fa-moon"></i>
                     </button>
@@ -1719,10 +1703,21 @@
                             <p>База данных сотрудников и дисциплинарные взыскания</p>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="roster-list" id="rosterList">
-                            <!-- Заполняется через JS -->
-                        </div>
+                    <div class="card" style="padding: 0; overflow: hidden;">
+                        <table class="roster-table">
+                            <thead>
+                                <tr>
+                                    <th>Позывной</th>
+                                    <th>Звание</th>
+                                    <th>Отдел</th>
+                                    <th>Статус</th>
+                                    <th>Взыскание</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rosterTbody">
+                                <!-- Заполняется через JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -1754,6 +1749,8 @@
 
         window.logout = function() {
             currentUser = null;
+            sessionStorage.removeItem('mtf7_session');
+            sessionStorage.removeItem('mtf7_section');
             document.getElementById('fleetRegisterBtn').classList.add('hidden');
             location.reload();
         };
@@ -1995,6 +1992,35 @@
             
             // Обновляем сообщение
             updateDataStatus();
+
+            // ВОССТАНОВЛЕНИЕ СЕССИИ (если перезагрузка, а не первый вход)
+            if (!currentUser) {
+                try {
+                    const saved = sessionStorage.getItem('mtf7_session');
+                    if (saved) {
+                        const { callsign, code } = JSON.parse(saved);
+                        const agent = agentsDB.find(a => {
+                            const sc = a.callsign.toLowerCase().replace(/\s+/g, '');
+                            const ic = callsign.toLowerCase().replace(/\s+/g, '');
+                            return sc === ic && a.code === code;
+                        });
+                        if (agent) {
+                            // Пользователь найден — восстанавливаем без уведомления
+                            currentUser = agent;
+                            buildSecureInterface();
+                            // Восстанавливаем раздел
+                            const savedSection = sessionStorage.getItem('mtf7_section');
+                            if (savedSection) setTimeout(() => switchTab(savedSection), 150);
+                            // НЕ показываем sec popup при авто-восстановлении
+                            document.getElementById('secPopup')?.classList.add('hidden');
+                        } else {
+                            // Пользователь удалён из таблицы — чистим сессию
+                            sessionStorage.removeItem('mtf7_session');
+                            sessionStorage.removeItem('mtf7_section');
+                        }
+                    }
+                } catch(e) {}
+            }
         }
 
         // ОБНОВЛЕНИЕ СТАТУСА ДАННЫХ
@@ -2095,8 +2121,19 @@
             // ПОКАЗАТЬ КНОПКУ РЕЕСТРА ТРАНСПОРТА ДЛЯ АВТОРИЗОВАННЫХ
             document.getElementById('fleetRegisterBtn').classList.remove('hidden');
 
-            // СКРЫТЬ КНОПКУ АВТОРИЗАЦИИ ПОСЛЕ ВХОДА
+            // СКРЫТЬ КНОПКУ АВТОРИЗАЦИИ, ПОКАЗАТЬ КНОПКУ ПЕРЕЗАГРУЗКИ
             document.querySelector('.auth-btn').classList.add('hidden');
+            document.getElementById('reloadBtn').classList.add('visible');
+
+            // СОХРАНИТЬ СЕССИЮ
+            if (currentUser) {
+                try {
+                    sessionStorage.setItem('mtf7_session', JSON.stringify({
+                        callsign: currentUser.callsign,
+                        code: currentUser.code
+                    }));
+                } catch(e) {}
+            }
 
             // ПОКАЗАТЬ УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ
             showSecPopup();
@@ -2152,37 +2189,37 @@
             nav.innerHTML = menuHTML;
         }
 
-        // СОСТАВ — ЧИСТЫЙ СПИСОК
+        // СОСТАВ — ЧИСТАЯ ТАБЛИЦА
         function renderRoster() {
-            const list = document.getElementById('rosterList');
-            if (!list) return;
-            list.innerHTML = '';
+            const tbody = document.getElementById('rosterTbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
 
             agentsDB.forEach(a => {
-                let statusClass = 'leave';
-                if (a.status.toLowerCase().includes('active'))   statusClass = 'active';
-                else if (a.status.toLowerCase().includes('inactive')) statusClass = 'inactive';
-
                 let depts = [];
                 if (a.isTRT) depts.push('TRT');
                 if (a.isCID) depts.push('CID');
 
                 const hasPunish = a.punishment && a.punishment.trim() !== '';
+                const isCmd = a.rank.toLowerCase().includes('commander') || a.rank.toLowerCase().includes('sub');
 
-                const row = document.createElement('div');
-                row.className = 'roster-row';
-                row.title = 'Нажмите для подробностей';
-                row.innerHTML = `
-                    <div>
-                        <div class="roster-agent-name">${a.callsign}</div>
-                        <div class="roster-agent-rank">${a.rank}</div>
-                    </div>
-                    <div class="roster-agent-dept">${depts.join(' / ') || '—'}</div>
-                    <div>${hasPunish ? `<span class="roster-punish-tag"><i class="fas fa-gavel"></i> ${a.punishment}</span>` : ''}</div>
-                    <span class="roster-status-dot ${statusClass}" title="${a.status}"></span>
+                let statusClass = 's-leave';
+                if (a.status.toLowerCase().includes('active'))   statusClass = 's-active';
+                else if (a.status.toLowerCase().includes('inactive')) statusClass = 's-inactive';
+
+                let rowClass = hasPunish ? 'row-punished' : (isCmd ? 'row-commander' : '');
+
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+                tr.innerHTML = `
+                    <td class="roster-td-callsign">${a.callsign}</td>
+                    <td class="roster-td-rank">${a.rank}</td>
+                    <td class="roster-td-dept">${depts.join(' / ') || '—'}</td>
+                    <td class="roster-td-status ${statusClass}">${a.status}</td>
+                    <td class="roster-td-punish">${hasPunish ? a.punishment : '—'}</td>
                 `;
-                row.addEventListener('click', () => openAgentModal(a));
-                list.appendChild(row);
+                tr.addEventListener('click', () => openAgentModal(a));
+                tbody.appendChild(tr);
             });
         }
 
@@ -2319,7 +2356,11 @@
 
         // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         window.switchTab = function(id) {
-            currentSection = id; // обновляем для логики защиты
+            currentSection = id;
+            // Сохраняем текущий раздел для восстановления после перезагрузки
+            if (currentUser) {
+                try { sessionStorage.setItem('mtf7_section', id); } catch(e) {}
+            }
 
             // Скрыть все секции
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
@@ -2361,21 +2402,33 @@
         }
         // === УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ ===
         function showSecPopup() {
-            if (localStorage.getItem('mtf7_sec_no_show') === '1') return;
             const popup = document.getElementById('secPopup');
             if (popup) popup.classList.remove('hidden');
         }
 
         window.closeSecPopup = function() {
             const popup = document.getElementById('secPopup');
-            if (!popup) return;
-            if (document.getElementById('secNoShow')?.checked) {
-                localStorage.setItem('mtf7_sec_no_show', '1');
-            }
-            popup.classList.add('hidden');
+            if (popup) popup.classList.add('hidden');
         };
 
-        // Drag logic
+        // === МЯГКАЯ ПЕРЕЗАГРУЗКА (без выброса из сессии) ===
+        window.softReload = function() {
+            const btn = document.getElementById('reloadBtn');
+            if (btn) btn.querySelector('i').classList.add('fa-spin');
+            // Сбрасываем кэш данных
+            try {
+                sessionStorage.removeItem('mtf7_data_cache');
+                sessionStorage.removeItem('mtf7_data_cache_time');
+            } catch(e) {}
+            // Перезагружаем данные с таблицы
+            loadDataWithCORS().then(() => {
+                if (btn) btn.querySelector('i').classList.remove('fa-spin');
+            }).catch(() => {
+                if (btn) btn.querySelector('i').classList.remove('fa-spin');
+            });
+        };
+
+        // Drag logic для sec-popup
         (function() {
             const popup = document.getElementById('secPopup');
             const handle = document.getElementById('secPopupDrag');
@@ -2384,59 +2437,45 @@
             let isDragging = false;
             let startX, startY, origLeft, origTop;
 
-            function getPopupPos() {
+            function ensureAbsolutePos() {
                 const r = popup.getBoundingClientRect();
-                return { left: r.left, top: r.top };
-            }
-
-            function startDrag(clientX, clientY) {
-                isDragging = true;
-                const pos = getPopupPos();
-                // Переключаем позиционирование на left/top без transform
-                popup.style.transform = 'none';
-                popup.style.left = pos.left + 'px';
-                popup.style.top = pos.top + 'px';
-                startX = clientX;
-                startY = clientY;
-                origLeft = pos.left;
-                origTop = pos.top;
-                document.body.style.userSelect = 'none';
+                popup.style.bottom = 'auto';
+                popup.style.right = 'auto';
+                popup.style.left = r.left + 'px';
+                popup.style.top = r.top + 'px';
             }
 
             function onMove(clientX, clientY) {
                 if (!isDragging) return;
-                const dx = clientX - startX;
-                const dy = clientY - startY;
-                let newLeft = origLeft + dx;
-                let newTop = origTop + dy;
-                // Не выходим за экран
-                newLeft = Math.max(0, Math.min(window.innerWidth - popup.offsetWidth, newLeft));
-                newTop = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, newTop));
+                let newLeft = origLeft + (clientX - startX);
+                let newTop  = origTop  + (clientY - startY);
+                newLeft = Math.max(0, Math.min(window.innerWidth  - popup.offsetWidth,  newLeft));
+                newTop  = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, newTop));
                 popup.style.left = newLeft + 'px';
-                popup.style.top = newTop + 'px';
+                popup.style.top  = newTop  + 'px';
             }
 
-            function endDrag() {
-                isDragging = false;
-                document.body.style.userSelect = '';
-            }
+            handle.addEventListener('mousedown', e => {
+                ensureAbsolutePos();
+                isDragging = true;
+                startX = e.clientX; startY = e.clientY;
+                origLeft = parseInt(popup.style.left); origTop = parseInt(popup.style.top);
+                document.body.style.userSelect = 'none';
+            });
+            document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+            document.addEventListener('mouseup', () => { isDragging = false; document.body.style.userSelect = ''; });
 
-            // Mouse
-            handle.addEventListener('mousedown', e => { startDrag(e.clientX, e.clientY); });
-            document.addEventListener('mousemove', e => { onMove(e.clientX, e.clientY); });
-            document.addEventListener('mouseup', endDrag);
-
-            // Touch (мобайл)
             handle.addEventListener('touchstart', e => {
-                const t = e.touches[0];
-                startDrag(t.clientX, t.clientY);
+                ensureAbsolutePos();
+                isDragging = true;
+                startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+                origLeft = parseInt(popup.style.left); origTop = parseInt(popup.style.top);
             }, { passive: true });
             document.addEventListener('touchmove', e => {
                 if (!isDragging) return;
-                const t = e.touches[0];
-                onMove(t.clientX, t.clientY);
+                onMove(e.touches[0].clientX, e.touches[0].clientY);
             }, { passive: true });
-            document.addEventListener('touchend', endDrag);
+            document.addEventListener('touchend', () => { isDragging = false; });
         })();
 
     </script>
