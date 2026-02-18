@@ -438,41 +438,96 @@
             }
         }
 
-        /* === УВЕДОМЛЕНИЕ О ЗАЩИТЕ === */
-        .security-notice {
+        /* === УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ (ПЕРЕТАСКИВАЕМОЕ) === */
+        .sec-popup {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 380px;
+            max-width: 92vw;
             background: var(--bg-panel);
             border: 1px solid var(--border);
-            border-left: 3px solid var(--danger);
-            padding: 10px 14px;
+            box-shadow: 0 8px 40px var(--shadow);
+            z-index: 4000;
+            animation: fadeIn 0.3s ease;
+            cursor: default;
+            user-select: none;
+        }
+        .sec-popup.hidden { display: none; }
+
+        .sec-popup-drag {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--border);
+            cursor: grab;
             font-size: 10px;
             color: var(--text-muted);
-            z-index: 900;
-            max-width: 260px;
-            line-height: 1.5;
-            pointer-events: none;
-        }
-        .security-notice strong {
-            color: var(--danger);
-            display: block;
-            margin-bottom: 3px;
-            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 700;
         }
-        @media (max-width: 768px) {
-            .security-notice {
-                bottom: 10px;
-                right: 10px;
-                max-width: 200px;
-                font-size: 9px;
-                padding: 8px 11px;
-            }
+        .sec-popup-drag:active { cursor: grabbing; }
+        .sec-popup-drag span { display: flex; align-items: center; gap: 8px; }
+        .sec-popup-close {
+            background: none; border: none;
+            color: var(--text-muted); cursor: pointer;
+            font-size: 14px; padding: 0; line-height: 1;
+            transition: color 0.2s;
         }
+        .sec-popup-close:hover { color: var(--accent); }
 
-        /* === СОСТАВ: ЧИСТЫЙ СПИСОК === */
+        .sec-popup-body {
+            padding: 20px 20px 16px 20px;
+        }
+        .sec-popup-body p {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin: 0 0 16px 0;
+        }
+        .sec-popup-body p strong { color: var(--text-main); }
+
+        .sec-popup-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            gap: 12px;
+        }
+        .sec-popup-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .sec-popup-check input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 13px; height: 13px;
+            cursor: pointer;
+        }
+        .sec-popup-ok {
+            padding: 8px 20px;
+            background: var(--accent);
+            color: var(--bg-body);
+            border: none;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .sec-popup-ok:hover { opacity: 0.85; }
+
+        /* === МОДАЛ АГЕНТА === */
         .roster-list {
             display: flex;
             flex-direction: column;
@@ -814,10 +869,26 @@
 
     <div id="screenshotShield"></div>
 
-    <!-- Уведомление о системе защиты -->
-    <div class="security-notice">
-        <strong><i class="fas fa-shield-alt"></i> &nbsp;Система мониторинга активна</strong>
-        Съёмка экрана заблокирована. Распространение информации посторонним лицам запрещено и влечёт немедленное отстранение.
+    <!-- Уведомление безопасности -->
+    <div class="sec-popup hidden" id="secPopup">
+        <div class="sec-popup-drag" id="secPopupDrag">
+            <span><i class="fas fa-shield-alt"></i> Уведомление безопасности</span>
+            <button class="sec-popup-close" onclick="closeSecPopup()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sec-popup-body">
+            <p>
+                На данном портале активна <strong>система мониторинга</strong>. Съёмка экрана и запись контента на защищённых страницах заблокированы.
+            </p>
+            <p style="margin-bottom:0;">
+                Распространение информации посторонним лицам <strong>строго запрещено</strong> и влечёт немедленное отстранение от службы без права восстановления.
+            </p>
+            <div class="sec-popup-footer">
+                <label class="sec-popup-check">
+                    <input type="checkbox" id="secNoShow"> Не показывать снова
+                </label>
+                <button class="sec-popup-ok" onclick="closeSecPopup()">Принято</button>
+            </div>
+        </div>
     </div>
 
     <!-- Модал агента -->
@@ -2027,6 +2098,9 @@
             // СКРЫТЬ КНОПКУ АВТОРИЗАЦИИ ПОСЛЕ ВХОДА
             document.querySelector('.auth-btn').classList.add('hidden');
 
+            // ПОКАЗАТЬ УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ
+            showSecPopup();
+
             const nav = document.getElementById('navMenu');
             // Сброс меню
             let menuHTML = `<button onclick="switchTab('public'); closeMobileMenu();" class="nav-btn active"><i class="fas fa-globe"></i> Общая информация</button>`;
@@ -2285,6 +2359,86 @@
                 document.querySelector('.scroll-container').scrollTop = 0;
             }
         }
+        // === УВЕДОМЛЕНИЕ БЕЗОПАСНОСТИ ===
+        function showSecPopup() {
+            if (localStorage.getItem('mtf7_sec_no_show') === '1') return;
+            const popup = document.getElementById('secPopup');
+            if (popup) popup.classList.remove('hidden');
+        }
+
+        window.closeSecPopup = function() {
+            const popup = document.getElementById('secPopup');
+            if (!popup) return;
+            if (document.getElementById('secNoShow')?.checked) {
+                localStorage.setItem('mtf7_sec_no_show', '1');
+            }
+            popup.classList.add('hidden');
+        };
+
+        // Drag logic
+        (function() {
+            const popup = document.getElementById('secPopup');
+            const handle = document.getElementById('secPopupDrag');
+            if (!popup || !handle) return;
+
+            let isDragging = false;
+            let startX, startY, origLeft, origTop;
+
+            function getPopupPos() {
+                const r = popup.getBoundingClientRect();
+                return { left: r.left, top: r.top };
+            }
+
+            function startDrag(clientX, clientY) {
+                isDragging = true;
+                const pos = getPopupPos();
+                // Переключаем позиционирование на left/top без transform
+                popup.style.transform = 'none';
+                popup.style.left = pos.left + 'px';
+                popup.style.top = pos.top + 'px';
+                startX = clientX;
+                startY = clientY;
+                origLeft = pos.left;
+                origTop = pos.top;
+                document.body.style.userSelect = 'none';
+            }
+
+            function onMove(clientX, clientY) {
+                if (!isDragging) return;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                let newLeft = origLeft + dx;
+                let newTop = origTop + dy;
+                // Не выходим за экран
+                newLeft = Math.max(0, Math.min(window.innerWidth - popup.offsetWidth, newLeft));
+                newTop = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, newTop));
+                popup.style.left = newLeft + 'px';
+                popup.style.top = newTop + 'px';
+            }
+
+            function endDrag() {
+                isDragging = false;
+                document.body.style.userSelect = '';
+            }
+
+            // Mouse
+            handle.addEventListener('mousedown', e => { startDrag(e.clientX, e.clientY); });
+            document.addEventListener('mousemove', e => { onMove(e.clientX, e.clientY); });
+            document.addEventListener('mouseup', endDrag);
+
+            // Touch (мобайл)
+            handle.addEventListener('touchstart', e => {
+                const t = e.touches[0];
+                startDrag(t.clientX, t.clientY);
+            }, { passive: true });
+            document.addEventListener('touchmove', e => {
+                if (!isDragging) return;
+                const t = e.touches[0];
+                onMove(t.clientX, t.clientY);
+            }, { passive: true });
+            document.addEventListener('touchend', endDrag);
+        })();
+
     </script>
 </body>
 </html>
