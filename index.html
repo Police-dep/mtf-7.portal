@@ -2305,7 +2305,6 @@
             document.addEventListener('keyup', function(e) {
                 heldKeys.delete(e.key);
                 if (!isDangerous()) {
-                    // Держим щит 1.2сек после отпускания клавиш
                     hideShield(1200);
                 }
             }, true);
@@ -2320,35 +2319,6 @@
                         shield.style.display = 'none';
                     }, 200);
                 }
-            });
-
-            // === ПК: потеря фокуса (Alt+Tab, Win+D, Snip overlay) ===
-            window.addEventListener('blur', function() {
-                showShield();
-            });
-
-            window.addEventListener('focus', function() {
-                heldKeys.clear();
-                hideShield(300);
-            });
-
-            // === МОБАЙЛ: смена вкладки / переход в другое приложение ===
-            // visibilitychange — срабатывает на iOS Safari и Android Chrome
-            document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'hidden') {
-                    // Страница скрыта — показываем щит немедленно
-                    if (isProtectedPage()) {
-                        shield.style.display = 'block';
-                    }
-                } else {
-                    // Страница снова видна — убираем щит через небольшую задержку
-                    hideShield(400);
-                }
-            });
-
-            // pagehide — дополнительно для iOS (иногда visibilitychange запаздывает)
-            window.addEventListener('pagehide', function() {
-                if (isProtectedPage()) shield.style.display = 'block';
             });
 
             document.addEventListener('dragstart', e => e.preventDefault());
@@ -2412,20 +2382,45 @@
         };
 
         // === МЯГКАЯ ПЕРЕЗАГРУЗКА (без выброса из сессии) ===
-        window.softReload = function() {
+        window.softReload = async function() {
             const btn = document.getElementById('reloadBtn');
-            if (btn) btn.querySelector('i').classList.add('fa-spin');
-            // Сбрасываем кэш данных
+            const icon = btn ? btn.querySelector('i') : null;
+            if (icon) icon.classList.add('fa-spin');
+
+            // Сбрасываем кэш
             try {
                 sessionStorage.removeItem('mtf7_data_cache');
                 sessionStorage.removeItem('mtf7_data_cache_time');
             } catch(e) {}
-            // Перезагружаем данные с таблицы
-            loadDataWithCORS().then(() => {
-                if (btn) btn.querySelector('i').classList.remove('fa-spin');
-            }).catch(() => {
-                if (btn) btn.querySelector('i').classList.remove('fa-spin');
-            });
+
+            try {
+                await loadDataWithCORS();
+            } catch(e) {}
+
+            // После перезагрузки данных — перерисовываем то, что видит пользователь
+            if (currentUser) {
+                // Обновляем состав если открыт
+                if (currentSection === 'rosterSection') {
+                    renderRoster();
+                }
+                // Проверяем что текущий пользователь ещё есть в базе
+                const stillExists = agentsDB.find(a => {
+                    const sc = a.callsign.toLowerCase().replace(/\s+/g, '');
+                    const ic = currentUser.callsign.toLowerCase().replace(/\s+/g, '');
+                    return sc === ic && a.code === currentUser.code;
+                });
+                if (!stillExists) {
+                    // Удалён из таблицы — выход
+                    sessionStorage.removeItem('mtf7_session');
+                    sessionStorage.removeItem('mtf7_section');
+                    location.reload();
+                    return;
+                }
+                // Обновляем объект currentUser свежими данными из таблицы
+                currentUser = stillExists;
+            }
+
+            if (icon) icon.classList.remove('fa-spin');
         };
 
         // Drag logic для sec-popup
