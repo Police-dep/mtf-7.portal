@@ -416,6 +416,241 @@
             border-bottom: none;
         }
 
+        /* === ЗАЩИТА ОТ СКРИНШОТОВ === */
+        #screenshotShield {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 99999;
+        }
+        @media print {
+            body * { visibility: hidden !important; }
+            body::after {
+                visibility: visible !important;
+                content: 'НЕСАНКЦИОНИРОВАННЫЙ ДОСТУП ЗАПРЕЩЁН — MTF-7 SECURE DATABASE';
+                position: fixed; top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 24px; color: #fff;
+                background: #000; padding: 40px;
+                font-family: monospace;
+            }
+        }
+
+        /* === СОСТАВ: ШАПКА СО СТАТИСТИКОЙ === */
+        .roster-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        .stat-block {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--accent);
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-block .stat-num {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            display: block;
+        }
+        .stat-block .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+            display: block;
+        }
+        .stat-block.stat-active { border-top-color: var(--success); }
+        .stat-block.stat-active .stat-num { color: var(--success); }
+        .stat-block.stat-warn { border-top-color: var(--danger); }
+        .stat-block.stat-warn .stat-num { color: var(--danger); }
+        .stat-block.stat-cid { border-top-color: #4a9eff; }
+        .stat-block.stat-cid .stat-num { color: #4a9eff; }
+
+        /* === СОСТАВ: ФИЛЬТРЫ === */
+        .roster-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .roster-search {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 12px;
+        }
+        .roster-search:focus { outline: none; border-color: var(--accent); }
+        .filter-btn {
+            padding: 10px 18px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent);
+            color: var(--bg-body);
+            border-color: var(--accent);
+        }
+
+        /* === СОСТАВ: КАРТОЧКИ АГЕНТОВ === */
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .agent-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--text-muted);
+            padding: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .agent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow);
+            border-left-color: var(--accent);
+        }
+        .agent-card.is-commander { border-left-color: var(--warning); }
+        .agent-card.is-commander:hover { border-left-color: var(--warning); }
+        .agent-card.has-punishment { border-left-color: var(--danger); }
+        .agent-card.has-punishment:hover { border-left-color: var(--danger); }
+
+        .agent-card-header {
+            padding: 20px 20px 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+        }
+        .agent-callsign {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+        .agent-rank-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 3px;
+            letter-spacing: 0.5px;
+        }
+        .agent-status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .agent-status-dot.active { background: var(--success); box-shadow: 0 0 6px var(--success); }
+        .agent-status-dot.inactive { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+        .agent-status-dot.leave { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+
+        .agent-card-body {
+            padding: 14px 20px 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        .agent-dept-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .dept-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .dept-tag.trt { border-color: var(--danger); color: var(--danger); background: rgba(207,52,52,0.08); }
+        .dept-tag.cid { border-color: #4a9eff; color: #4a9eff; background: rgba(74,158,255,0.08); }
+
+        .agent-punishment-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            background: rgba(207,52,52,0.12);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* === МОДАЛ АГЕНТА === */
+        .agent-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .agent-modal-overlay.open { display: flex; }
+        .agent-modal {
+            width: 480px;
+            max-width: 90%;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--accent);
+            box-shadow: 0 0 60px var(--shadow);
+            animation: fadeIn 0.2s ease;
+        }
+        .agent-modal-header {
+            padding: 28px 30px 20px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .agent-modal-name { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: 2px; }
+        .agent-modal-rank { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+        .agent-modal-close {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 20px; cursor: pointer; padding: 0; transition: 0.2s;
+        }
+        .agent-modal-close:hover { color: var(--accent); }
+        .agent-modal-body { padding: 24px 30px; }
+        .agent-modal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border);
+            font-size: 13px;
+        }
+        .agent-modal-row:last-child { border-bottom: none; }
+        .agent-modal-row .row-label { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .agent-modal-row .row-value { color: var(--text-main); font-weight: 700; text-align: right; }
+
         /* === МЕДИА-ЗАПРОСЫ ДЛЯ АДАПТИВНОСТИ === */
         
         /* Планшеты и маленькие ноутбуки */
@@ -455,6 +690,12 @@
             .top-bar {
                 padding: 0 30px;
             }
+        }
+
+        /* Медиа для карточек состава */
+        @media (max-width: 900px) {
+            .roster-stats { grid-template-columns: repeat(2, 1fr); }
+            .roster-grid { grid-template-columns: 1fr; }
         }
 
         /* Телефоны */
@@ -651,6 +892,22 @@
     </style>
 </head>
 <body>
+
+    <div id="screenshotShield"></div>
+
+    <!-- Модал агента -->
+    <div class="agent-modal-overlay" id="agentModal" onclick="closeAgentModal(event)">
+        <div class="agent-modal">
+            <div class="agent-modal-header">
+                <div>
+                    <div class="agent-modal-name" id="modalCallsign"></div>
+                    <div class="agent-modal-rank" id="modalRank"></div>
+                </div>
+                <button class="agent-modal-close" onclick="document.getElementById('agentModal').classList.remove('open')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="agent-modal-body" id="modalBody"></div>
+        </div>
+    </div>
 
     <div id="loginOverlay" class="login-overlay hidden">
         <div class="login-box">
@@ -1335,29 +1592,171 @@
                                 <li>местонахождение заложников</li>
                             </ul>
                         </div>
+
+                        <div class="protocol-item">
+                            <h4><i class="fas fa-shield-alt"></i> 7. Иерархия безопасности и приоритеты</h4>
+                            <p>Каждый агент мобильной опергруппы при принятии тактических решений обязан руководствоваться строгой иерархией сохранения жизни. Это не рекомендация — это обязательный оперативный стандарт. Нарушение иерархии в поле приравнивается к провалу операции и влечет служебное расследование.</p>
+                            <p>Решения принимаются в следующем порядке значимости:</p>
+                            <ol>
+                                <li><strong>Заложники и гражданские лица внутри периметра</strong> — высший приоритет. Любое тактическое решение принимается с учетом их местонахождения. Если гражданский находится под непосредственной угрозой — агент обязан вступить в контакт с целью немедленно, даже в одиночку, не ожидая подкрепления. Промедление, вызванное страхом или нерешительностью, является нарушением протокола.</li>
+                                <li><strong>Личный состав группы</strong> — второй приоритет. Агент не является расходным материалом. Если гражданским не угрожает гибель в ближайшие секунды — агент не должен занимать позицию под открытым огнем без укрытия, преследовать вооруженного в одиночку или входить в неизвестное помещение без поддержки. Раненый агент парализует группу: требует эвакуации, тратит ресурсы, нарушает построение.</li>
+                                <li><strong>Гражданские вне зоны периметра</strong> — третий приоритет. Каждый агент несет личную ответственность за контроль сектора обстрела. Перед открытием огня агент обязан визуально убедиться, что траектория пули не ведет за периметр оцепления. Огонь через стены, двери и в направлении скопления людей без четкой идентификации цели — запрещен.</li>
+                                <li><strong>Подозреваемый (Цель)</strong> — низший приоритет. Жизнь цели не является тактической ценностью, если она угрожает перечисленным выше категориям. При этом ликвидация цели не является самоцелью: если цель обезоружена или утратила возможность угрожать — применение летальной силы прекращается.</li>
+                            </ol>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-exclamation-circle"></i> 7.1. Принцип "не создавай вторую жертву"</h4>
+                                <p>Агент, бросившийся спасать заложника без оценки обстановки, рискует стать второй жертвой и полностью дестабилизировать группу. Перед любым сближением с целью агент обязан ответить на три вопроса: <strong>где цель, где заложник, где моя поддержка</strong>. Если хотя бы один ответ неизвестен — агент удерживает позицию и запрашивает группу. Эмоциональные решения в поле убивают быстрее, чем пуля противника.</p>
+                            </div>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-broadcast-tower"></i> 7.2. Доклад о статусе</h4>
+                                <p>В ходе операции каждый агент обязан кратко докладывать командиру при любом изменении обстановки: обнаружение новой цели, смена позиции, ранение, исчерпание боеприпасов, обнаружение гражданских. Командир на основании докладов корректирует тактику. Молчание в эфире при активной угрозе интерпретируется как нештатная ситуация — группа обязана проверить агента.</p>
+                                <p>Стандарт доклада: <strong>[Позывной] — [локация] — [статус / угроза]</strong>. Пример: "Альфа, угол здания — вижу цель, пистолет, движется к выходу". Не более двух предложений. Лишние слова в эфире создают шум и отвлекают.</p>
+                            </div>
+                        </div>
+
+                        <div class="protocol-item">
+                            <h4><i class="fas fa-crosshairs"></i> 8. Классификация угроз и регламент реагирования</h4>
+                            <p>Тактика группы (немедленный штурм, оцепление или кризисные переговоры) определяется исключительно статусом цели на момент прибытия. Командир группы обязан классифицировать угрозу в течение первых 60 секунд и объявить протокол в эфире. Смена протокола также объявляется вслух — самостоятельная переоценка ситуации агентом без команды запрещена.</p>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-running"></i> ПРОТОКОЛ I — "Немедленное вмешательство" (Активный стрелок)</h4>
+                                <p><strong>Признаки:</strong> звуки выстрелов, визуально подтвержденные жертвы, цель активно перемещается и ведет огонь.</p>
+                                <p>Группа не ожидает полного сбора состава — входят немедленно. Нет переговоров, нет предупреждений, нет выдвижения ультиматумов. Каждая секунда промедления означает новых жертв.</p>
+                                <p><strong>Порядок действий:</strong></p>
+                                <ol>
+                                    <li>Командир объявляет в эфире: "Протокол Один, активный стрелок, вход немедленно".</li>
+                                    <li>Группа формирует контактную колонну: минимум двое, оружие готово, движение к последнему известному положению цели.</li>
+                                    <li>Агенты двигаются на звук. Если стрельба прекратилась — не расслабляться: цель могла перезарядиться, затаиться или взять заложника.</li>
+                                    <li>При обнаружении цели — немедленно объявить "Стоп, не двигаться, бросить оружие". Если команда игнорируется или цель поднимает ствол — огонь на поражение без паузы.</li>
+                                    <li>Раненых гражданских не трогать до нейтрализации угрозы: оказание помощи под огнем создает неподвижную мишень из агента.</li>
+                                </ol>
+                                <p><strong>Критический момент:</strong> не путать активного стрелка с паникующим вооруженным гражданином. Если лицо удерживает оружие, не стреляет и кричит — это уже ситуация забаррикадировавшегося. Командир обязан переоценить статус.</p>
+                            </div>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-lock"></i> ПРОТОКОЛ II — "Оцепление и сдерживание" (Забаррикадировавшийся)</h4>
+                                <p><strong>Признаки:</strong> вооруженная цель закрылась в помещении, не ведет активного огня, отказывается выходить, не удерживает заложников.</p>
+                                <p>Ключевой принцип: <strong>время работает на нас</strong>. Голодный, уставший, нервирующийся человек рано или поздно примет неверное решение. Задача агентов — не дать ему сбежать и не создать повода для начала стрельбы.</p>
+                                <p><strong>Порядок действий:</strong></p>
+                                <ol>
+                                    <li>Установить внешний периметр: перекрыть все пути отхода — выходы, окна, подвальные люки. Каждый агент держит свой сектор и не оставляет позицию без команды.</li>
+                                    <li>Исключить контакт гражданских с зоной: всех посторонних лиц удалить за периметр. Зеваки и гражданские вблизи окон — потенциальные жертвы и помехи для работы группы.</li>
+                                    <li>Установить голосовой контакт. Командир или назначенный агент начинает словесный контакт через дверь или с безопасного угла: спокойный, уверенный тон, без угроз, без эмоций. Цель диалога — узнать состояние цели, наличие оружия и возможных раненых.</li>
+                                    <li>Никто не подходит к двери вплотную. Позиция для голосового контакта — за углом стены или за укрытием с возможностью немедленного отхода.</li>
+                                    <li>Командир принимает решение о штурме только если: цель начала стрелять через дверь или стену, обнаружены жертвы внутри, или цель объявила о самоуничтожении.</li>
+                                </ol>
+                                <p><strong>Запрещено:</strong> агентам запрещено самостоятельно выдвигаться к двери, угрожать в эфире ("мы войдем и убьем тебя"), создавать шум или провокации, а также покидать позицию без смены.</p>
+                            </div>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-user-shield"></i> ПРОТОКОЛ III — "Кризисный вход" (Захватчик заложника)</h4>
+                                <p><strong>Признаки:</strong> цель удерживает одного или нескольких человек, использует их как живой щит или инструмент давления.</p>
+                                <p>Это наиболее сложный сценарий. Приоритет — жизнь заложника. Штурм рассматривается как крайняя мера. Неправильно выбранный момент входа убивает заложника, а не спасает его.</p>
+                                <p><strong>Порядок действий:</strong></p>
+                                <ol>
+                                    <li>Командир немедленно назначает ведущего переговорщика из состава группы — одного агента, который говорит. Остальные агенты молчат в эфире и удерживают периметр.</li>
+                                    <li>Переговорщик устанавливает голосовой контакт. Задачи: выяснить количество заложников и их состояние, требования цели, оружие цели, эмоциональный статус. Каждое полученное слово — информация для командира.</li>
+                                    <li>Командир удерживает группу в готовности к немедленному входу, но без движения. Позиции — у всех возможных точек входа одновременно, если позволяет состав группы.</li>
+                                    <li><strong>Критерии немедленного штурма без команды:</strong> агент визуально наблюдает, что цель производит действия, угрожающие жизни заложника (поднимает оружие к голове, начинает физическое насилие). В этом случае — вход немедленно, доклад после.</li>
+                                    <li>При штурме: первый агент нейтрализует цель, второй немедленно закрывает заложника собой или выводит его из зоны огня. Заложник не должен оставаться стоять рядом с нейтрализованной целью.</li>
+                                    <li>После нейтрализации цели и обеспечения безопасности заложника — полный осмотр помещения. Цель могла иметь сообщника или второй выход.</li>
+                                </ol>
+                                <p><strong>Психологический фактор:</strong> захватчик заложника, как правило, находится в состоянии крайнего стресса. Резкие звуки, крики, агрессивный тон переговорщика могут спровоцировать импульсивный выстрел. Голос всегда ровный, темп речи медленный, требования — конкретные и выполнимые.</p>
+                            </div>
+                        </div>
+
+                        <div class="protocol-item">
+                            <h4><i class="fas fa-exclamation-triangle"></i> 9. Основания для открытия огня на поражение</h4>
+                            <p>Применение летальной силы — это крайняя и невозобновляемая мера. Каждый выстрел агента должен быть обоснован. Агент, применивший оружие без соблюдения настоящего регламента, несет полную служебную и правовую ответственность вне зависимости от исхода операции.</p>
+                            <p>Огонь открывается только при одновременном совпадении всех трёх факторов <strong>"Треугольника угрозы"</strong>:</p>
+                            <ol>
+                                <li><strong>Средство (Ability)</strong> — у цели визуально подтверждено наличие: огнестрельного оружия, холодного оружия на дистанции ближнего боя, предмета, используемого как оружие (арматура, бита, бутылка), либо транспортного средства, направленного на агента или гражданских. Вербальная угроза без средства — не является основанием.</li>
+                                <li><strong>Возможность (Opportunity)</strong> — цель находится на дистанции или в позиции, при которой способна эффективно применить своё средство. Вооруженный человек за закрытой дверью — не имеет прямой возможности. Вооруженный человек на дистанции 5 метров, без преграды между ним и агентом — имеет.</li>
+                                <li><strong>Намерение (Intent)</strong> — поведение цели явно свидетельствует о готовности немедленно применить оружие: направляет ствол, не реагирует на команду "Стоп / Бросить оружие" и продолжает движение, занимает изготовку для выстрела, производит атаку.</li>
+                            </ol>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-bullseye"></i> 9.1. Техника применения оружия</h4>
+                                <p>Огонь всегда открывается <strong>в центр массы</strong> — область груди. Это наибольшая площадь поражения и расположение жизненно важных органов. Огонь в конечности, предупредительный огонь в воздух или по асфальту — запрещены: непредсказуемы по результату и создают дополнительную угрозу для окружающих.</p>
+                                <p>Стрельба продолжается до <strong>полного прекращения агрессивных действий</strong> целью. Это означает: цель упала и не двигается, цель бросила оружие и подняла руки, цель потеряла сознание. Если цель упала, но продолжает удерживать оружие и не выполняет команды — угроза не устранена.</p>
+                                <p>После прекращения огня: агент немедленно докладывает в эфир "цель нейтрализована / выстрелы произведены", удерживает оружие направленным на цель до подтверждения безопасности, не приближается к цели в одиночку.</p>
+                            </div>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-hand-paper"></i> 9.2. Словесное предупреждение перед выстрелом</h4>
+                                <p>Стандартная команда перед применением оружия: <strong>"Стоп! Бросить оружие!"</strong> — громко, четко, однократно. Если ситуация позволяет (есть физическая дистанция, цель не производит выстрел прямо сейчас) — предупреждение обязательно.</p>
+                                <p>Предупреждение <strong>не требуется</strong> в следующих случаях: цель уже производит выстрел; цель находится на дистанции удара холодным оружием и движется на агента; любая пауза приведет к немедленной гибели агента или заложника. В этих случаях — немедленный огонь без предупреждения является законным и обоснованным.</p>
+                            </div>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-user-injured"></i> 9.3. Действия после применения оружия</h4>
+                                <ol>
+                                    <li>Доклад командиру: позывной, количество выстрелов, статус цели, свой статус.</li>
+                                    <li>Периметр не снимается до полного осмотра — у цели могут быть сообщники в здании.</li>
+                                    <li>К нейтрализованной цели подходят двое: один держит под прицелом, второй — проверяет пульс, убирает оружие ногой за пределы досягаемости и надевает наручники. Наручники надеваются на нейтрализованную цель всегда, независимо от визуального состояния.</li>
+                                    <li>Оружие цели не поднимается руками — фиксируется место, фотографируется при возможности, сообщается командиру.</li>
+                                    <li>Агент, применивший оружие, не дает показаний посторонним до служебного разбора. Все вопросы — только командиру группы.</li>
+                                </ol>
+                            </div>
+
+                            <div class="subsection">
+                                <h4><i class="fas fa-ban"></i> 9.4. Запрещенные основания для открытия огня</h4>
+                                <ul class="doc-list">
+                                    <li>Вербальные угрозы без оружия в руках ("Я тебя убью" — не является основанием)</li>
+                                    <li>Попытка бегства без оружия — беглец задерживается, не уничтожается</li>
+                                    <li>Нахождение в розыске — само по себе не дает права на огонь</li>
+                                    <li>Приказ третьего лица или гражданского ("Стреляй в него!")</li>
+                                    <li>Эмоциональное состояние агента (злость, страх, желание отомстить за коллегу)</li>
+                                    <li>Цель обезоружена и лежит на земле — дальнейший огонь является превышением силы</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 <section id="rosterSection" class="section">
                     <div class="section-header">
-                        <h1><i class="fas fa-users"></i> Личный состав</h1>
-                        <p>База данных сотрудников и дисциплинарные взыскания</p>
+                        <div>
+                            <h1><i class="fas fa-users"></i> Личный состав</h1>
+                            <p>База данных сотрудников и дисциплинарные взыскания</p>
+                        </div>
                     </div>
-                    <div class="card">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Позывной</th>
-                                    <th>Звание</th>
-                                    <th>Отдел</th>
-                                    <th>Статус</th>
-                                    <th>Взыскания</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rosterTableBody">
-                                <!-- Данные будут заполнены через JavaScript -->
-                            </tbody>
-                        </table>
+
+                    <!-- Статистика -->
+                    <div class="roster-stats">
+                        <div class="stat-block">
+                            <span class="stat-num" id="statTotal">—</span>
+                            <span class="stat-label">Всего агентов</span>
+                        </div>
+                        <div class="stat-block stat-active">
+                            <span class="stat-num" id="statActive">—</span>
+                            <span class="stat-label">Активны</span>
+                        </div>
+                        <div class="stat-block stat-warn">
+                            <span class="stat-num" id="statPunished">—</span>
+                            <span class="stat-label">Взыскания</span>
+                        </div>
+                        <div class="stat-block stat-cid">
+                            <span class="stat-num" id="statTRT">—</span>
+                            <span class="stat-label">TRT / CID</span>
+                        </div>
+                    </div>
+
+                    <!-- Поиск и фильтры -->
+                    <div class="roster-filters">
+                        <input type="text" class="roster-search" id="rosterSearch" placeholder="Поиск по позывному..." oninput="filterRoster()">
+                        <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Все</button>
+                        <button class="filter-btn" data-filter="trt" onclick="setFilter('trt', this)">TRT</button>
+                        <button class="filter-btn" data-filter="cid" onclick="setFilter('cid', this)">CID</button>
+                        <button class="filter-btn" data-filter="active" onclick="setFilter('active', this)">Active</button>
+                        <button class="filter-btn" data-filter="punished" onclick="setFilter('punished', this)">Взыскания</button>
+                    </div>
+
+                    <!-- Карточки агентов -->
+                    <div class="roster-grid" id="rosterGrid">
+                        <!-- Заполняется через JS -->
                     </div>
                 </section>
 
@@ -1462,6 +1861,21 @@
 
         // ЗАГРУЗКА ДАННЫХ С ИСПОЛЬЗОВАНИЕМ CORS ПРОКСИ
         async function loadDataWithCORS() {
+            // Проверяем кэш в sessionStorage (данные кэшируются на 5 минут)
+            const CACHE_KEY = 'mtf7_data_cache';
+            const CACHE_TIME_KEY = 'mtf7_data_cache_time';
+            const CACHE_TTL = 5 * 60 * 1000; // 5 минут
+            try {
+                const cachedData = sessionStorage.getItem(CACHE_KEY);
+                const cachedTime = sessionStorage.getItem(CACHE_TIME_KEY);
+                if (cachedData && cachedTime && (Date.now() - parseInt(cachedTime)) < CACHE_TTL) {
+                    console.log('Используем кэшированные данные');
+                    const rows = JSON.parse(cachedData);
+                    processData(rows);
+                    return;
+                }
+            } catch(e) { /* игнорируем ошибки кэша */ }
+
             try {
                 // Используем CORS прокси для обхода ограничений
                 const corsProxy = 'https://api.allorigins.win/raw?url=';
@@ -1491,6 +1905,12 @@
                 console.log('Успешно загружено строк:', rows.length);
                 console.log('Первые 3 строки для отладки:', rows.slice(0, 3));
                 
+                // Сохраняем в кэш
+                try {
+                    sessionStorage.setItem('mtf7_data_cache', JSON.stringify(rows));
+                    sessionStorage.setItem('mtf7_data_cache_time', Date.now().toString());
+                } catch(e) { /* игнорируем ошибки кэша */ }
+
                 processData(rows);
                 
             } catch (error) {
@@ -1533,6 +1953,12 @@
             
             console.log('Прямая загрузка успешна, строк:', rows.length);
             
+            // Сохраняем в кэш
+            try {
+                sessionStorage.setItem('mtf7_data_cache', JSON.stringify(rows));
+                sessionStorage.setItem('mtf7_data_cache_time', Date.now().toString());
+            } catch(e) { /* игнорируем ошибки кэша */ }
+
             processData(rows);
         }
 
@@ -1702,6 +2128,9 @@
             // ПОКАЗАТЬ КНОПКУ РЕЕСТРА ТРАНСПОРТА ДЛЯ АВТОРИЗОВАННЫХ
             document.getElementById('fleetRegisterBtn').classList.remove('hidden');
 
+            // СКРЫТЬ КНОПКУ АВТОРИЗАЦИИ ПОСЛЕ ВХОДА
+            document.querySelector('.auth-btn').classList.add('hidden');
+
             const nav = document.getElementById('navMenu');
             // Сброс меню
             let menuHTML = `<button onclick="switchTab('public'); closeMobileMenu();" class="nav-btn active"><i class="fas fa-globe"></i> Общая информация</button>`;
@@ -1753,35 +2182,217 @@
             nav.innerHTML = menuHTML;
         }
 
-        // ТАБЛИЦА СОСТАВА
+        // ТАБЛИЦА СОСТАВА — КАРТОЧКИ
+        let currentFilter = 'all';
+        let allAgentsRendered = [];
+
         function renderRoster() {
-            const tbody = document.getElementById('rosterTableBody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            agentsDB.forEach(a => {
-                let statusColor = a.status.toLowerCase().includes('active') ? 'var(--success)' : 
-                                a.status.toLowerCase().includes('inactive') ? 'var(--danger)' : 'var(--warning)';
-                
-                let depts = [];
-                if(a.isCID) depts.push('CID');
-                if(a.isTRT) depts.push('TRT');
+            allAgentsRendered = agentsDB.slice();
+            updateRosterStats();
+            renderFilteredRoster();
+        }
 
-                // Взыскания красным
-                let punishHTML = a.punishment ? `<span style="color:var(--danger); font-weight:bold">${a.punishment}</span>` : '-';
+        function updateRosterStats() {
+            const total = agentsDB.length;
+            const active = agentsDB.filter(a => a.status.toLowerCase().includes('active')).length;
+            const punished = agentsDB.filter(a => a.punishment && a.punishment.trim() !== '').length;
+            const trtOrCid = agentsDB.filter(a => a.isTRT || a.isCID).length;
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="color: var(--accent);">${a.callsign}</td>
-                    <td>${a.rank}</td>
-                    <td>${depts.join(' / ') || '-'}</td>
-                    <td style="color:${statusColor}">${a.status}</td>
-                    <td>${punishHTML}</td>
+            const el = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+            el('statTotal', total);
+            el('statActive', active);
+            el('statPunished', punished);
+            el('statTRT', trtOrCid);
+        }
+
+        window.setFilter = function(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderFilteredRoster();
+        };
+
+        window.filterRoster = function() {
+            renderFilteredRoster();
+        };
+
+        function renderFilteredRoster() {
+            const grid = document.getElementById('rosterGrid');
+            if (!grid) return;
+
+            const search = (document.getElementById('rosterSearch')?.value || '').toLowerCase().trim();
+
+            let filtered = agentsDB.filter(a => {
+                const matchSearch = !search || a.callsign.toLowerCase().includes(search) || a.rank.toLowerCase().includes(search);
+                let matchFilter = true;
+                if (currentFilter === 'trt') matchFilter = a.isTRT;
+                else if (currentFilter === 'cid') matchFilter = a.isCID;
+                else if (currentFilter === 'active') matchFilter = a.status.toLowerCase().includes('active');
+                else if (currentFilter === 'punished') matchFilter = a.punishment && a.punishment.trim() !== '';
+                return matchSearch && matchFilter;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="color:var(--text-muted); padding:40px; text-align:center; font-size:13px; grid-column: 1/-1;"><i class="fas fa-search" style="margin-bottom:10px; display:block; font-size:24px;"></i>Нет агентов по выбранному фильтру</div>`;
+                return;
+            }
+
+            grid.innerHTML = '';
+            filtered.forEach(a => {
+                const isCommander = a.rank.toLowerCase().includes('commander') || a.rank.toLowerCase().includes('sub');
+                const hasPunish = a.punishment && a.punishment.trim() !== '';
+
+                let statusClass = 'leave';
+                if (a.status.toLowerCase().includes('active')) statusClass = 'active';
+                else if (a.status.toLowerCase().includes('inactive')) statusClass = 'inactive';
+
+                let cardClass = 'agent-card';
+                if (hasPunish) cardClass += ' has-punishment';
+                else if (isCommander) cardClass += ' is-commander';
+
+                let deptTags = '';
+                if (a.isTRT) deptTags += `<span class="dept-tag trt"><i class="fas fa-crosshairs"></i> TRT</span>`;
+                if (a.isCID) deptTags += `<span class="dept-tag cid"><i class="fas fa-search"></i> CID</span>`;
+                if (!a.isTRT && !a.isCID) deptTags += `<span class="dept-tag">—</span>`;
+
+                let punishBadge = hasPunish
+                    ? `<span class="agent-punishment-badge"><i class="fas fa-gavel"></i> ${a.punishment}</span>`
+                    : '';
+
+                const card = document.createElement('div');
+                card.className = cardClass;
+                card.innerHTML = `
+                    <div class="agent-card-header">
+                        <div>
+                            <div class="agent-callsign">${a.callsign}</div>
+                            <div class="agent-rank-label">${a.rank}</div>
+                        </div>
+                        <span class="agent-status-dot ${statusClass}" title="${a.status}"></span>
+                    </div>
+                    <div class="agent-card-body">
+                        <div class="agent-dept-tags">${deptTags}</div>
+                        ${punishBadge}
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                card.addEventListener('click', () => openAgentModal(a));
+                grid.appendChild(card);
             });
         }
+
+        // МОДАЛ АГЕНТА
+        window.openAgentModal = function(a) {
+            document.getElementById('modalCallsign').textContent = a.callsign;
+            document.getElementById('modalRank').textContent = a.rank.toUpperCase();
+
+            let depts = [];
+            if (a.isTRT) depts.push('TRT');
+            if (a.isCID) depts.push('CID');
+
+            let statusColor = a.status.toLowerCase().includes('active') ? 'var(--success)'
+                : a.status.toLowerCase().includes('inactive') ? 'var(--danger)' : 'var(--warning)';
+
+            let punishRow = a.punishment && a.punishment.trim() !== ''
+                ? `<div class="agent-modal-row"><span class="row-label">Взыскание</span><span class="row-value" style="color:var(--danger)">${a.punishment}</span></div>`
+                : `<div class="agent-modal-row"><span class="row-label">Взыскание</span><span class="row-value" style="color:var(--success)">Отсутствует</span></div>`;
+
+            document.getElementById('modalBody').innerHTML = `
+                <div class="agent-modal-row"><span class="row-label">Звание</span><span class="row-value">${a.rank}</span></div>
+                <div class="agent-modal-row"><span class="row-label">Отдел</span><span class="row-value">${depts.join(' / ') || 'Не назначен'}</span></div>
+                <div class="agent-modal-row"><span class="row-label">Статус</span><span class="row-value" style="color:${statusColor}">${a.status}</span></div>
+                ${punishRow}
+            `;
+
+            document.getElementById('agentModal').classList.add('open');
+        };
+
+        window.closeAgentModal = function(e) {
+            if (e.target === document.getElementById('agentModal')) {
+                document.getElementById('agentModal').classList.remove('open');
+            }
+        };
+
+        // === ЗАЩИТА ОТ СКРИНШОТОВ v2 ===
+        (function() {
+            const shield = document.getElementById('screenshotShield');
+            if (!shield) return;
+
+            // Набор зажатых сейчас клавиш
+            const heldKeys = new Set();
+            let hideTimer = null;
+
+            // Опасные модификаторы и ключи
+            // Логика: щит показывается КАК ТОЛЬКО зажат любой из опасных модификаторов
+            // Это покрывает Win+Shift+S — щит встаёт ещё до нажатия S
+            // Снимается через 1.5сек ПОСЛЕ того как ВСЕ опасные клавиши отпущены
+            const DANGER_KEYS = new Set([
+                'PrintScreen', 'Meta', 'Shift', 'Alt'
+            ]);
+
+            // Комбинации, при которых щит точно нужен (проверяем при каждом keydown)
+            function isDangerous() {
+                // PrintScreen в любом сочетании
+                if (heldKeys.has('PrintScreen')) return true;
+                // Win/Cmd + Shift — начало Win+Shift+S или macOS скриншотов
+                if (heldKeys.has('Meta') && heldKeys.has('Shift')) return true;
+                // Alt зажат — Alt+PrintScreen
+                if (heldKeys.has('Alt')) return true;
+                return false;
+            }
+
+            function showShield() {
+                shield.style.display = 'block';
+                clearTimeout(hideTimer);
+                // Пытаемся затереть буфер обмена через небольшую задержку
+                // (после того как ОС успела что-то туда положить)
+                setTimeout(() => {
+                    try { navigator.clipboard.writeText('').catch(() => {}); } catch(e) {}
+                }, 50);
+                setTimeout(() => {
+                    try { navigator.clipboard.writeText('').catch(() => {}); } catch(e) {}
+                }, 500);
+            }
+
+            function tryHide() {
+                clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => {
+                    if (!isDangerous()) {
+                        shield.style.display = 'none';
+                    }
+                }, 1500); // держим щит 1.5сек после отпускания
+            }
+
+            document.addEventListener('keydown', function(e) {
+                heldKeys.add(e.key);
+
+                if (isDangerous()) {
+                    showShield();
+                    e.preventDefault(); // попытка предотвратить дефолтное действие
+                }
+            }, true); // capture phase — срабатывает раньше всего
+
+            document.addEventListener('keyup', function(e) {
+                heldKeys.delete(e.key);
+                if (!isDangerous()) {
+                    tryHide();
+                }
+            }, true);
+
+            // Сброс при потере фокуса страницы (Alt+Tab, сворачивание, Snip overlay)
+            window.addEventListener('blur', function() {
+                showShield();
+            });
+
+            window.addEventListener('focus', function() {
+                // Чистим набор зажатых (могли отпустить пока окно было скрыто)
+                heldKeys.clear();
+                tryHide();
+            });
+
+            // Блокировка правой кнопки мыши и drag (уже есть выше, дублируем для надёжности)
+            document.addEventListener('dragstart', e => e.preventDefault());
+
+            // Скрываем содержимое при печати (уже есть в CSS @media print)
+        })();
 
         // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         window.switchTab = function(id) {
