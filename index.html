@@ -1727,7 +1727,6 @@
 
     <script>
         // КОНФИГУРАЦИЯ
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTA6JsQdPWCevnaNCzSoWnRfHyrMa1sdv2MHmYcmy06QWWIT6THg7dJZknKnKJL3Qp4OXR5xmzirNeo/pub?output=csv';
         
         let agentsDB = [];
         let fleetDB = [];
@@ -1823,107 +1822,118 @@
             loadDataWithCORS();
         });
 
-        // ЗАГРУЗКА ДАННЫХ С ИСПОЛЬЗОВАНИЕМ CORS ПРОКСИ
-        async function loadDataWithCORS() {
-            // Проверяем кэш в sessionStorage (данные кэшируются на 5 минут)
-            const CACHE_KEY = 'mtf7_data_cache';
-            const CACHE_TIME_KEY = 'mtf7_data_cache_time';
-            const CACHE_TTL = 5 * 60 * 1000; // 5 минут
-            try {
-                const cachedData = sessionStorage.getItem(CACHE_KEY);
-                const cachedTime = sessionStorage.getItem(CACHE_TIME_KEY);
-                if (cachedData && cachedTime && (Date.now() - parseInt(cachedTime)) < CACHE_TTL) {
-                    console.log('Используем кэшированные данные');
-                    const rows = JSON.parse(cachedData);
-                    processData(rows);
-                    return;
-                }
-            } catch(e) { /* игнорируем ошибки кэша */ }
+        // ЗАГРУЗКА ДАННЫХ — БЫСТРАЯ СТРАТЕГИЯ
+        // 1. Если есть кэш — показываем его МГНОВЕННО, не ждём сети
+        // 2. Параллельно запускаем гонку: прямой запрос + 2 CORS-прокси
+        // 3. Первый кто ответил — обновляет данные и кэш (stale-while-revalidate)
+        
+        const SHEET_URL_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTA6JsQdPWCevnaNCzSoWnRfHyrMa1sdv2MHmYcmy06QWWIT6THg7dJZknKnKJL3Qp4OXR5xmzirNeo/pub?output=csv';
+        const CACHE_KEY      = 'mtf7_data_v2';
+        const CACHE_TIME_KEY = 'mtf7_data_time_v2';
+        const CACHE_TTL      = 3 * 60 * 1000; // 3 мин — после этого фоново обновляем
 
-            try {
-                // Используем CORS прокси для обхода ограничений
-                const corsProxy = 'https://api.allorigins.win/raw?url=';
-                const url = corsProxy + encodeURIComponent(SHEET_URL + '&_=' + Date.now());
-                
-                console.log('Загружаем данные с URL:', url);
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ошибка: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                
-                if (!csvText || csvText.trim() === '') {
-                    throw new Error('Получен пустой ответ');
-                }
-                
-                // Парсим CSV
-                const rows = Papa.parse(csvText, { 
-                    header: false, 
-                    skipEmptyLines: true,
-                    encoding: 'UTF-8'
-                }).data;
-                
-                console.log('Успешно загружено строк:', rows.length);
-                console.log('Первые 3 строки для отладки:', rows.slice(0, 3));
-                
-                // Сохраняем в кэш
-                try {
-                    sessionStorage.setItem('mtf7_data_cache', JSON.stringify(rows));
-                    sessionStorage.setItem('mtf7_data_cache_time', Date.now().toString());
-                } catch(e) { /* игнорируем ошибки кэша */ }
+        // Список источников — пробуем все одновременно, берём первый ответ
+        function buildSources() {
+            const bust = Date.now();
+            return [
+                // Прямой запрос — если Google разрешает (обычно да для публичных таблиц)
+                `${SHEET_URL_BASE}&_=${bust}`,
+                // CORS-прокси #1 (быстрый, надёжный)
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_URL_BASE + '&_=' + bust)}`,
+                // CORS-прокси #2 (резервный)
+                `https://corsproxy.io/?${encodeURIComponent(SHEET_URL_BASE + '&_=' + bust)}`,
+            ];
+        }
 
-                processData(rows);
-                
-            } catch (error) {
-                console.error('Ошибка при загрузке через CORS прокси:', error);
-                
-                // Пробуем альтернативный метод без прокси
-                try {
-                    console.log('Пробуем альтернативный метод...');
-                    await loadDataDirect();
-                } catch (error2) {
-                    console.error('Альтернативный метод также не сработал:', error2);
-                    showError();
-                }
+        // Один запрос с таймаутом
+        async function fetchWithTimeout(url, ms = 7000) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), ms);
+            try {
+                const r = await fetch(url, { signal: ctrl.signal });
+                clearTimeout(timer);
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const text = await r.text();
+                if (!text || text.trim().length < 10) throw new Error('empty');
+                return text;
+            } finally {
+                clearTimeout(timer);
             }
         }
 
-        // ПРЯМАЯ ЗАГРУЗКА БЕЗ ПРОКСИ
-        async function loadDataDirect() {
-            const url = SHEET_URL + '&_=' + Date.now();
-            console.log('Пробуем прямой доступ к:', url);
-            
-            const response = await fetch(url);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ошибка: ${response.status}`);
-            }
-            
-            const csvText = await response.text();
-            
-            if (!csvText || csvText.trim() === '') {
-                throw new Error('Получен пустой ответ');
-            }
-            
-            // Парсим CSV
-            const rows = Papa.parse(csvText, { 
-                header: false, 
+        // Гонка всех источников — возвращает первый успешный
+        async function raceFetch() {
+            const sources = buildSources();
+            return new Promise((resolve, reject) => {
+                let done = false;
+                let errors = 0;
+                sources.forEach(url => {
+                    fetchWithTimeout(url).then(text => {
+                        if (!done) { done = true; resolve(text); }
+                    }).catch(() => {
+                        errors++;
+                        if (errors === sources.length) reject(new Error('Все источники недоступны'));
+                    });
+                });
+            });
+        }
+
+        function parseCSV(text) {
+            return Papa.parse(text, {
+                header: false,
                 skipEmptyLines: true,
                 encoding: 'UTF-8'
             }).data;
-            
-            console.log('Прямая загрузка успешна, строк:', rows.length);
-            
-            // Сохраняем в кэш
-            try {
-                sessionStorage.setItem('mtf7_data_cache', JSON.stringify(rows));
-                sessionStorage.setItem('mtf7_data_cache_time', Date.now().toString());
-            } catch(e) { /* игнорируем ошибки кэша */ }
+        }
 
-            processData(rows);
+        function saveCache(rows) {
+            try {
+                sessionStorage.setItem(CACHE_KEY, JSON.stringify(rows));
+                sessionStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+            } catch(e) {}
+        }
+
+        function loadCache() {
+            try {
+                const raw = sessionStorage.getItem(CACHE_KEY);
+                const t   = sessionStorage.getItem(CACHE_TIME_KEY);
+                if (!raw || !t) return null;
+                return { rows: JSON.parse(raw), age: Date.now() - parseInt(t) };
+            } catch(e) { return null; }
+        }
+
+        async function loadDataWithCORS() {
+            const cached = loadCache();
+
+            if (cached) {
+                // Показываем кэш немедленно
+                console.log(`Кэш: показываем мгновенно (возраст ${Math.round(cached.age/1000)}с)`);
+                processData(cached.rows);
+
+                // Если кэш устарел — обновляем фоново, не блокируя UI
+                if (cached.age > CACHE_TTL) {
+                    console.log('Кэш устарел — фоновое обновление...');
+                    raceFetch().then(text => {
+                        const rows = parseCSV(text);
+                        saveCache(rows);
+                        processData(rows);
+                        console.log('Фоновое обновление завершено');
+                    }).catch(e => console.warn('Фоновое обновление не удалось:', e));
+                }
+                return;
+            }
+
+            // Кэша нет — ждём первый ответ из гонки
+            console.log('Нет кэша — загружаем...');
+            try {
+                const text = await raceFetch();
+                const rows = parseCSV(text);
+                saveCache(rows);
+                processData(rows);
+            } catch(e) {
+                console.error('Не удалось загрузить данные:', e);
+                showError();
+            }
         }
 
         // ОБРАБОТКА ДАННЫХ
@@ -2389,8 +2399,8 @@
 
             // Сбрасываем кэш
             try {
-                sessionStorage.removeItem('mtf7_data_cache');
-                sessionStorage.removeItem('mtf7_data_cache_time');
+                sessionStorage.removeItem(CACHE_KEY);
+                sessionStorage.removeItem(CACHE_TIME_KEY);
             } catch(e) {}
 
             try {
